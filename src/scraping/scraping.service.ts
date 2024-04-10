@@ -1,10 +1,20 @@
+import {
+  GetCommand,
+  GetCommandInput,
+  PutCommand,
+  PutCommandInput,
+} from '@aws-sdk/lib-dynamodb';
 import { HttpService } from '@nestjs/axios';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
+import { AppService } from 'src/app.service';
 
 @Injectable()
 export class ScrapingService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private appService: AppService,
+  ) {}
   async scraping(url: string) {
     try {
       const result = await firstValueFrom(
@@ -40,11 +50,50 @@ export class ScrapingService {
       /**
        * props.pageProps.ssrPayload.courses[0].recipe.websiteUrl
        */
-      const recipeIds = [];
+      const recipeUrls = [];
       json.props.pageProps.ssrPayload.courses.forEach((course) => {
-        recipeIds.push(course.recipe.websiteUrl);
+        recipeUrls.push(course.recipe.websiteUrl);
+      });
+
+      const recipeIds = recipeUrls.map((url: string) => {
+        return url.split('recipes/')[1];
       });
       return recipeIds;
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+      throw new InternalServerErrorException(err);
+    }
+  }
+
+  async saveRecipe(recipe: Record<string, unknown>, recipeId: string) {
+    const client = await this.appService.giveMeTheDynamoDbClient();
+
+    const entity = {
+      ...recipe,
+      pk: recipeId,
+      sk: recipe.totalTime,
+    };
+
+    const putCommandInput: PutCommandInput = {
+      Item: entity,
+      TableName: 'recipes',
+      ConditionExpression: `attribute_not_exists(pk) and attribute_not_exists(sk)`,
+    };
+
+    await client.send(new PutCommand(putCommandInput));
+  }
+
+  async test() {
+    const client = await this.appService.giveMeTheDynamoDbClient();
+
+    const getCommandInput: GetCommandInput = {
+      TableName: 'recipes',
+      Key: {
+        pk: 'something',
+        sk: 'somethingelse',
+      },
+    };
+
+    await client.send(new GetCommand(getCommandInput));
   }
 }
