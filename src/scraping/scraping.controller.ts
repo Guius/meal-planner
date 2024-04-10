@@ -9,4 +9,9 @@ export class ScrapingController {
   async scrapeRecipeFromUrl(@Param('url') url: string) {
     return this.scrapingService.scraping(url);
   }
+
+  @Get('menu/:url')
+  async scrapeMenuFromUrl(@Param('url') url: string) {
+    return this.scrapingService.getMenu(url);
+  }
 }

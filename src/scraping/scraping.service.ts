@@ -24,4 +24,27 @@ export class ScrapingService {
       throw new InternalServerErrorException(err);
     }
   }
+
+  async getMenu(url: string) {
+    try {
+      const result = await firstValueFrom(
+        this.httpService.get(`https://www.hellofresh.co.uk/menus/${url}`),
+      );
+      const html = result.data as string;
+      const split1 = html.split(
+        '<script id="__NEXT_DATA__" type="application/json">',
+      )[1];
+      const split2 = split1.split('(function(){if (!document.body)')[0];
+      const split3 = split2.split('</script><script>')[0];
+      const json = JSON.parse(split3);
+      /**
+       * props.pageProps.ssrPayload.courses[0].recipe.websiteUrl
+       */
+      const recipeIds = [];
+      json.props.pageProps.ssrPayload.courses.forEach((course) => {
+        recipeIds.push(course.recipe.websiteUrl);
+      });
+      return recipeIds;
+    } catch (err) {}
+  }
 }
