@@ -68,11 +68,21 @@ export class ScrapingService {
   async saveRecipe(recipe: Record<string, unknown>, recipeId: string) {
     const client = await this.appService.giveMeTheDynamoDbClient();
 
-    const entity = {
+    const entity: Record<string, unknown> = {
       ...recipe,
       pk: recipeId,
       sk: recipe.totalTime,
     };
+
+    // find out if food is vegetarian or vegan
+    if ((recipe.keywords as string[]).includes('Vegan')) {
+      entity.diet = 'Vegan';
+    } else if ((recipe.keywords as string[]).includes('Veggie')) {
+      entity.diet = 'Vegetarian';
+    }
+    // then make the diet searchable
+    entity.GSI1_pk = entity.pk;
+    entity.GSI1_sk = entity.diet;
 
     const putCommandInput: PutCommandInput = {
       Item: entity,
@@ -81,19 +91,5 @@ export class ScrapingService {
     };
 
     await client.send(new PutCommand(putCommandInput));
-  }
-
-  async test() {
-    const client = await this.appService.giveMeTheDynamoDbClient();
-
-    const getCommandInput: GetCommandInput = {
-      TableName: 'recipes',
-      Key: {
-        pk: 'something',
-        sk: 'somethingelse',
-      },
-    };
-
-    await client.send(new GetCommand(getCommandInput));
   }
 }

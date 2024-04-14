@@ -22,9 +22,4 @@ export class ScrapingController {
   ) {
     return await this.scrapingService.saveRecipe(body, url);
   }
-
-  @Get('test')
-  async test() {
-    await this.scrapingService.test();
-  }
 }

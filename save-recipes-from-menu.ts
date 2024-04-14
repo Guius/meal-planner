@@ -51,13 +51,16 @@ async function main(week: string) {
         recipeJson,
       );
     } catch (err) {
-      console.error(
-        `💣 Could not save recipe: ${JSON.stringify(err)}. Skipping this item`,
-      );
       if (err instanceof AxiosError) {
         if (err.name === 'ConditionalCheckFailedException') {
           numberOfDuplicates++;
-          console.log(`👎 Duplicate recipe ${currentRecipe}`);
+          console.log(`👎 Duplicate recipe ${currentRecipe}. Skipping.`);
+        } else {
+          console.error(
+            `💣 Could not save recipe: ${JSON.stringify(
+              err,
+            )}. Skipping this item`,
+          );
         }
       }
       continue;
