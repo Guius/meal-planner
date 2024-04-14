@@ -81,8 +81,8 @@ export class ScrapingService {
       entity.diet = 'Vegetarian';
     }
     // then make the diet searchable
-    entity.GSI1_pk = entity.pk;
-    entity.GSI1_sk = entity.diet;
+    entity.GSI1_pk = entity.diet;
+    entity.GSI1_sk = entity.sk;
 
     const putCommandInput: PutCommandInput = {
       Item: entity,
