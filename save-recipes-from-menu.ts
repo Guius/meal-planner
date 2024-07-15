@@ -70,11 +70,11 @@ async function main(week: string) {
 
   console.log(
     `👏 Successfully saved ${
-      menu.length - numberOfDuplicates
-    } recipes. Total recipes: ${
-      menu.length
-    }. Duplicates: ${numberOfDuplicates}`,
+      menu.length - (numberOfDuplicates ?? 0)
+    } recipes. Total recipes: ${menu.length}. Duplicates: ${
+      numberOfDuplicates ?? 0
+    }`,
   );
 }
 
-main('2024-W16');
+main('2024-W18');
