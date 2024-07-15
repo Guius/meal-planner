@@ -63,9 +63,17 @@ export class ScrapingService {
   async saveRecipe(recipe: Record<string, unknown>, recipeId: string) {
     const client = await this.appService.giveMeTheDynamoDbClient();
 
+    /**
+     * The title is in format: speedy-bulgogi-chicken-noodles-65cb875708f1b9082fbcc57f
+     * We want to remove the salt at the end
+     */
+    const recipeIdArray = recipeId.split('-');
+    recipeIdArray.pop();
+    const newRecipeId = recipeIdArray.join('-');
+
     const entity: Record<string, unknown> = {
       ...recipe,
-      pk: recipeId,
+      pk: newRecipeId,
       sk: recipe.totalTime,
     };
 
