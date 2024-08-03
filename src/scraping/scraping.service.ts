@@ -192,6 +192,26 @@ export class ScrapingService {
     };
 
     // the scraper script handles the case where the recipe already exists
-    await client.send(new PutCommand(putCommandInput));
+    try {
+      await client.send(new PutCommand(putCommandInput));
+    } catch (err) {
+      if (err instanceof Error) {
+        if (err.name === 'ConditionalCheckFailedException') {
+          console.log(`👎 Duplicate recipe ${entity.pk}. Skipping.`);
+        } else {
+          console.error(
+            `💣 Could not save recipe: ${err.name}. Skipping this item`,
+          );
+          throw new Error(err.name);
+        }
+      } else {
+        console.error(
+          `💣 Could not save recipe: ${JSON.stringify(
+            err,
+          )}. Skipping this item`,
+        );
+        throw new Error();
+      }
+    }
   }
 }
