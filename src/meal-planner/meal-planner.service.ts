@@ -14,6 +14,10 @@ import { AppService } from 'src/app.service';
 export class MealPlannerService {
   constructor(private appService: AppService) {}
 
+  /**
+   * Sends a DescribeCommandInput to find out the number of items in the recipes table
+   * @returns The number of items in the recipes table
+   */
   async getNumberOfRecipes() {
     const describeTableCommandInput: DescribeTableCommandInput = {
       TableName: 'recipes',

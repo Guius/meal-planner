@@ -46,23 +46,17 @@ async function main(week: string) {
     // save it to the database
     try {
       console.log(`📝 Saving recipe ${currentRecipe}`);
-      await axios.post(
+      const result = await axios.post(
         `http://localhost:3000/scraping/recipe/${currentRecipe}`,
         recipeJson,
       );
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        if (err.name === 'ConditionalCheckFailedException') {
-          numberOfDuplicates++;
-          console.log(`👎 Duplicate recipe ${currentRecipe}. Skipping.`);
-        } else {
-          console.error(
-            `💣 Could not save recipe: ${JSON.stringify(
-              err,
-            )}. Skipping this item`,
-          );
-        }
+      if (!result) {
+        numberOfDuplicates++;
       }
+    } catch (err) {
+      console.error(
+        `💣 Could not save recipe: ${JSON.stringify(err)}. Skipping this item`,
+      );
       continue;
     }
     console.log(`👍 Successfully saved recipe ${currentRecipe}`);

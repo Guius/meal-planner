@@ -1,6 +1,15 @@
+import {
+  DescribeTableCommand,
+  DescribeTableCommandInput,
+  DescribeTableCommandOutput,
+} from '@aws-sdk/client-dynamodb';
 import { PutCommand, PutCommandInput } from '@aws-sdk/lib-dynamodb';
 import { HttpService } from '@nestjs/axios';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { AppService } from 'src/app.service';
 
@@ -22,7 +31,6 @@ export class ScrapingService {
       const split2 = split1.split('<footer data-test-id="common-footer">')[0];
       const split3 = split2.split('</script></div></div>')[0];
       const json = JSON.parse(split3);
-      console.log(json);
       return json;
     } catch (err) {
       console.log(err);
@@ -60,8 +68,11 @@ export class ScrapingService {
     }
   }
 
-  async saveRecipe(recipe: Record<string, unknown>, recipeId: string) {
-    const client = await this.appService.giveMeTheDynamoDbClient();
+  async saveRecipe(
+    recipe: Record<string, unknown>,
+    recipeId: string,
+  ): Promise<boolean> {
+    const client = this.appService.giveMeTheDynamoDbClient();
 
     /**
      * The title is in format: speedy-bulgogi-chicken-noodles-65cb875708f1b9082fbcc57f
@@ -194,10 +205,12 @@ export class ScrapingService {
     // the scraper script handles the case where the recipe already exists
     try {
       await client.send(new PutCommand(putCommandInput));
+      return true;
     } catch (err) {
       if (err instanceof Error) {
         if (err.name === 'ConditionalCheckFailedException') {
           console.log(`👎 Duplicate recipe ${entity.pk}. Skipping.`);
+          return false;
         } else {
           console.error(
             `💣 Could not save recipe: ${err.name}. Skipping this item`,
@@ -213,5 +226,46 @@ export class ScrapingService {
         throw new Error();
       }
     }
+  }
+
+  /**
+   * Sends a DescribeCommandInput to find out the number of items in the recipes table
+   * @returns The number of items in the recipes table
+   */
+  async getNumberOfRecipes() {
+    const describeTableCommandInput: DescribeTableCommandInput = {
+      TableName: 'recipes',
+    };
+
+    const dynamoDBClient = this.appService.giveMeTheDynamoDbClient();
+
+    let describeTableCommandOutput: DescribeTableCommandOutput;
+    try {
+      describeTableCommandOutput = await dynamoDBClient.send(
+        new DescribeTableCommand(describeTableCommandInput),
+      );
+    } catch (error) {
+      Logger.error(
+        `Could not describe table ${describeTableCommandInput.TableName}`,
+      );
+      throw new InternalServerErrorException();
+    }
+
+    Logger.debug(
+      `Successfully described table ${describeTableCommandInput.TableName}.`,
+    );
+
+    if (!describeTableCommandOutput.Table) {
+      Logger.error(
+        `Could not find table ${describeTableCommandInput.TableName}`,
+      );
+      throw new InternalServerErrorException();
+    }
+
+    Logger.debug(
+      `Item count is ${describeTableCommandOutput.Table?.ItemCount}`,
+    );
+
+    return describeTableCommandOutput.Table.ItemCount;
   }
 }
