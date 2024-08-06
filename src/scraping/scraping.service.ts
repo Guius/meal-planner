@@ -2,8 +2,15 @@ import {
   DescribeTableCommand,
   DescribeTableCommandInput,
   DescribeTableCommandOutput,
+  GetItemCommand,
+  GetItemCommandInput,
+  QueryCommand,
 } from '@aws-sdk/client-dynamodb';
-import { PutCommand, PutCommandInput } from '@aws-sdk/lib-dynamodb';
+import {
+  PutCommand,
+  PutCommandInput,
+  QueryCommandInput,
+} from '@aws-sdk/lib-dynamodb';
 import { HttpService } from '@nestjs/axios';
 import {
   Injectable,
@@ -75,6 +82,78 @@ export class ScrapingService {
     const client = this.appService.giveMeTheDynamoDbClient();
 
     /**
+     * Each recipe will have a unique number. This number will be used to pick a random recipe.
+     * Hence each recipe we have should have a number between 1 and the total number of recipes.
+     *
+     * If we have deleted a recipe, then that number is now free to take (and should be used).
+     * All the free numbers to take will be stored in an array in the recipes table under #FREENUMBERS
+     */
+
+    // Get the free numbers
+    const getFreeNumberCommandInput: GetItemCommandInput = {
+      Key: {
+        pk: { S: '#FREENUMBERS' },
+        sk: { S: '#FREENUMBERS' },
+      },
+      TableName: 'recipes',
+    };
+
+    // let the error bubble to the scraping script
+    const freeNumbers: string[] = await client
+      .send(new GetItemCommand(getFreeNumberCommandInput))
+      .then((res) => {
+        return res.Item.freeNumbers.SS;
+      });
+
+    let recipeNumber = 0;
+
+    if (freeNumbers.length === 0) {
+      Logger.debug(
+        'No free numbers available. Fetching the next number to use',
+      );
+
+      /**
+       * GSI3 of recipes table is
+       * - pk: recipeNumber
+       * - sk: recipeNumber
+       *
+       * We can get the recipe number by querying GSI3 and scanning index forward false
+       */
+
+      const getRecipeNumberCommandInput: QueryCommandInput = {
+        TableName: 'recipes',
+        IndexName: 'GSI3',
+        ScanIndexForward: false,
+      };
+
+      const lastRecipeNumber = await client
+        .send(new QueryCommand(getRecipeNumberCommandInput))
+        .then((res) => {
+          if (res.Items.length === 0) {
+            return 0;
+          } else {
+            return parseInt(res.Items[0].sk.N);
+          }
+        });
+
+      recipeNumber = lastRecipeNumber + 1;
+    } else {
+      recipeNumber = parseInt(freeNumbers.pop());
+
+      // save the new free numbers
+      const putCommandInput: PutCommandInput = {
+        Item: {
+          pk: '#FREENUMBERS',
+          sk: '#FREENUMBERS',
+          freeNumbers: freeNumbers,
+        },
+        TableName: 'recipes',
+      };
+
+      await client.send(new PutCommand(putCommandInput));
+    }
+
+    /**
      * The title is in format: speedy-bulgogi-chicken-noodles-65cb875708f1b9082fbcc57f
      * We want to remove the salt at the end
      */
@@ -87,6 +166,12 @@ export class ScrapingService {
       pk: newRecipeId,
       sk: recipe.totalTime,
     };
+
+    /**
+     * Add recipe number to GSI3
+     */
+    entity.GSI3_pk = recipeNumber;
+    entity.GSI3_sk = recipeNumber;
 
     // find out if food is vegetarian or vegan
     if ((recipe.keywords as string[]).includes('Vegan')) {
