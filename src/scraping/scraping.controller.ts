@@ -15,11 +15,12 @@ export class ScrapingController {
     return this.scrapingService.getMenu(url);
   }
 
-  @Post('recipe/:url')
+  @Post('recipe/:url/:recipeNumber')
   async saveRecipe(
     @Body() body: Record<string, unknown>,
     @Param('url') url: string,
+    @Param('recipeNumber') recipeNumber: number,
   ) {
-    return await this.scrapingService.saveRecipe(body, url);
+    return await this.scrapingService.saveRecipe(body, url, +recipeNumber);
   }
 }
