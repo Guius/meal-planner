@@ -49,6 +49,7 @@ async function main(week: string) {
 
   console.log(`✅ Successfully got menu for week ${week}.`);
 
+  let recipeNumber = '0';
   /**
    * Each recipe will have a unique number. This number will be used to pick a random recipe.
    * Hence each recipe we have should have a number between 1 and the total number of recipes.
@@ -64,6 +65,7 @@ async function main(week: string) {
       sk: { S: '#FREENUMBERS' },
     },
     TableName: 'recipes',
+    ConsistentRead: true,
   };
 
   // let the error bubble to the scraping script
@@ -74,7 +76,7 @@ async function main(week: string) {
       return res.Item.freeNumbers.NS;
     });
 
-  let recipeNumber = '0';
+  let checkForFreeNumber = false;
 
   if (freeNumbers.length === 0) {
     Logger.debug('No free numbers available. Fetching the next number to use');
@@ -111,24 +113,12 @@ async function main(week: string) {
     recipeNumber = `${lastRecipeNumber + 1}`;
     Logger.debug(`Recipe number is ${recipeNumber}`);
   } else {
+    checkForFreeNumber = true;
+
     Logger.debug(`Free numbers found: ${freeNumbers}. `);
     recipeNumber = freeNumbers.pop();
 
     Logger.debug(`Recipe number is ${recipeNumber}`);
-
-    // save the new free numbers
-    const putCommandInput: PutCommandInput = {
-      Item: {
-        pk: '#FREENUMBERS',
-        sk: '#FREENUMBERS',
-        freeNumbers: freeNumbers,
-      },
-      TableName: 'recipes',
-    };
-
-    Logger.debug(`New free numbers: ${freeNumbers}`);
-
-    await client.send(new PutCommand(putCommandInput));
   }
 
   for (let i = 0; i < menu.length; i++) {
@@ -169,10 +159,103 @@ async function main(week: string) {
           `👯 Duplicate: ${currentRecipe}. Recipe number stays at ${recipeNumber}`,
         );
       } else {
-        recipeNumber = `${parseInt(recipeNumber) + 1}`;
         console.log(
-          `👍 Successfully saved recipe ${currentRecipe}. Recipe number is now ${recipeNumber}`,
+          `👍 Successfully saved recipe ${currentRecipe}. Going to determine recipe number`,
         );
+
+        /**
+         * FIXME:
+         * Currently if there was a free number originally but there is none left after that,
+         * we are not updating the free numbers array in the database
+         */
+
+        /**
+         * If checkForFreeNumber
+         * See if there is another free number in the database
+         * If not, then get the last recipe number and start from there + set checkForFreeNumber to false
+         * If yes, then use the free number and remove it from the freeNumbers array
+         */
+        if (checkForFreeNumber) {
+          console.debug(`Checking for a free number.`);
+          let freeNumbers: string[];
+          try {
+            freeNumbers = await client
+              .send(new GetItemCommand(getFreeNumberCommandInput))
+              .then((res) => {
+                if (!res.Item) return [];
+                return res.Item.freeNumbers.NS;
+              });
+          } catch (err) {
+            console.error(
+              `Could not get free numbers. Using normal order for the moment`,
+            );
+            freeNumbers = [];
+          }
+
+          if (freeNumbers.length > 0) {
+            recipeNumber = freeNumbers.pop();
+            checkForFreeNumber = true;
+
+            // save the new free numbers
+            const putCommandInput: PutCommandInput = {
+              Item: {
+                pk: '#FREENUMBERS',
+                sk: '#FREENUMBERS',
+                freeNumbers: freeNumbers,
+              },
+              TableName: 'recipes',
+            };
+
+            /**
+             * If this bombs, then let the script bomb out
+             * There is no point continuing if we cannot get a new recipe number.
+             */
+            await client.send(new PutCommand(putCommandInput));
+            Logger.debug(`New free numbers: ${freeNumbers}`);
+
+            console.log(`New recipe number is ${recipeNumber}`);
+
+            /**
+             * Now we have the new free number coming from the free numbers list
+             * Continue on to the next loop and on the next iteration,
+             * we will check again if there is a free number
+             */
+            continue;
+          }
+        }
+
+        console.log(
+          `No free numbers left. Going to get next recipe number to use`,
+        );
+
+        checkForFreeNumber = false;
+        const getRecipeNumberCommandInput: QueryCommandInput = {
+          TableName: 'recipes',
+          IndexName: 'GSI3',
+          ScanIndexForward: false,
+          Limit: 1,
+          KeyConditionExpression: 'GSI3_pk = :pk',
+          ExpressionAttributeValues: {
+            ':pk': { S: '#RECIPENUMBERS' },
+          },
+        };
+
+        /**
+         * If this bombs, then let the script bomb out
+         * There is no point continuing if we cannot get a new recipe number.
+         */
+        const lastRecipeNumber = await client
+          .send(new QueryCommand(getRecipeNumberCommandInput))
+          .then((res) => {
+            if (res.Items.length === 0) {
+              return 0;
+            } else {
+              return parseInt(res.Items[0].GSI3_sk.S);
+            }
+          });
+
+        recipeNumber = `${lastRecipeNumber + 1}`;
+        console.log(`New recipe number is ${recipeNumber}`);
       }
     } catch (err) {
       console.error(
@@ -193,4 +276,4 @@ async function main(week: string) {
   );
 }
 
-main('2024-W1');
+main('2024-W3');
