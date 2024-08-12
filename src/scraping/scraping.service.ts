@@ -2,15 +2,8 @@ import {
   DescribeTableCommand,
   DescribeTableCommandInput,
   DescribeTableCommandOutput,
-  GetItemCommand,
-  GetItemCommandInput,
-  QueryCommand,
 } from '@aws-sdk/client-dynamodb';
-import {
-  PutCommand,
-  PutCommandInput,
-  QueryCommandInput,
-} from '@aws-sdk/lib-dynamodb';
+import { PutCommand, PutCommandInput } from '@aws-sdk/lib-dynamodb';
 import { HttpService } from '@nestjs/axios';
 import {
   Injectable,
@@ -62,7 +55,7 @@ export class ScrapingService {
        */
       const recipeUrls = [];
       json.props.pageProps.ssrPayload.courses.forEach((course) => {
-        recipeUrls.push(course.recipe.websiteUrl);
+        recipeUrls.push(course.recipe.websiteUrl as never);
       });
 
       const recipeIds = recipeUrls.map((url: string) => {

@@ -1,6 +1,5 @@
 import {
   DynamoDBClient,
-  DynamoDBClientConfig,
   GetItemCommand,
   GetItemCommandInput,
   QueryCommand,
@@ -15,14 +14,10 @@ import { Logger } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 
 async function main(week: string) {
-  let config: DynamoDBClientConfig = null;
-
-  const nonLocalConfig: DynamoDBClientConfig = {
+  const config = {
     region: 'eu-west-2',
     apiVersion: '2012-08-10',
   };
-
-  config = nonLocalConfig;
 
   // create the client
   const client = DynamoDBDocumentClient.from(new DynamoDBClient(config), {
@@ -33,7 +28,7 @@ async function main(week: string) {
   });
 
   // Get menu
-  let numberOfDuplicates: number;
+  let numberOfDuplicates = 0;
 
   let menu;
   try {
@@ -87,7 +82,7 @@ async function main(week: string) {
           .send(new GetItemCommand(getFreeNumberCommandInput))
           .then((res) => {
             if (!res.Item) return [];
-            return res.Item.freeNumbers.NS;
+            return res.Item.freeNumbers.NS ?? [];
           });
       } catch (err) {
         console.error(
@@ -97,43 +92,39 @@ async function main(week: string) {
       }
 
       if (freeNumbers.length > 0) {
-        recipeNumber = freeNumbers.pop();
+        const lastItem = freeNumbers.pop();
+        if (lastItem) {
+          recipeNumber = lastItem;
 
-        checkForFreeNumber = true;
-        checkForNewNumber = false;
+          checkForFreeNumber = true;
+          checkForNewNumber = false;
 
-        /**
-         * FIXME:
-         * Currently we are removing the free number from the database even if we have not successfully
-         * saved the recipe yet.
-         * If saving the recipe bombs out, we have removed a free number but have not used it.
-         */
+          // save the new free numbers
+          const putCommandInput: PutCommandInput = {
+            Item: {
+              pk: '#FREENUMBERS',
+              sk: '#FREENUMBERS',
+              freeNumbers: freeNumbers,
+            },
+            TableName: 'recipes',
+          };
 
-        // save the new free numbers
-        const putCommandInput: PutCommandInput = {
-          Item: {
-            pk: '#FREENUMBERS',
-            sk: '#FREENUMBERS',
-            freeNumbers: freeNumbers,
-          },
-          TableName: 'recipes',
-        };
+          /**
+           * If this bombs, then let the script bomb out
+           * There is no point continuing if we cannot get a new recipe number.
+           */
+          await client.send(new PutCommand(putCommandInput));
+          Logger.debug(`New free numbers: ${freeNumbers}`);
 
-        /**
-         * If this bombs, then let the script bomb out
-         * There is no point continuing if we cannot get a new recipe number.
-         */
-        await client.send(new PutCommand(putCommandInput));
-        Logger.debug(`New free numbers: ${freeNumbers}`);
+          console.log(`New recipe number is ${recipeNumber}`);
 
-        console.log(`New recipe number is ${recipeNumber}`);
-
-        /**
-         * Now we have the new free number coming from the free numbers list
-         * Continue on to the next loop and on the next iteration,
-         * we will check again if there is a free number
-         */
-        continue;
+          /**
+           * Now we have the new free number coming from the free numbers list
+           * Continue on to the next loop and on the next iteration,
+           * we will check again if there is a free number
+           */
+          continue;
+        }
       } else {
         checkForFreeNumber = false;
         checkForNewNumber = true;
@@ -164,9 +155,15 @@ async function main(week: string) {
       const lastRecipeNumber = await client
         .send(new QueryCommand(getRecipeNumberCommandInput))
         .then((res) => {
-          if (res.Items.length === 0) {
+          if (!res.Items || res.Items.length === 0) {
             return 0;
           } else {
+            if (!res.Items[0].GSI3_sk.S) {
+              console.error(
+                `Found last recipe number but property GSI3_sk does not have S attribute`,
+              );
+              process.exit(1);
+            }
             return parseInt(res.Items[0].GSI3_sk.S);
           }
         });
@@ -247,6 +244,9 @@ async function main(week: string) {
    * then we are in a situation where we have removed that free number from the database
    * but have not used it.
    *
+   * Worse comes to worse, if this happens then we will have a gap in the recipe numbers
+   * In that case when we try and get a recipe and it doesn't exist, we can add that number to the free numbers again
+   *
    * FIXME:
    */
 
@@ -259,4 +259,4 @@ async function main(week: string) {
   );
 }
 
-main('2024-W3');
+main('2024-W4');

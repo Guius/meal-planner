@@ -4,8 +4,8 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  ddbClient: DynamoDBClient = null;
-  ddbDocumentClient: DynamoDBDocumentClient = null;
+  ddbClient: DynamoDBClient | null = null;
+  ddbDocumentClient: DynamoDBDocumentClient | null = null;
 
   getHello(): string {
     return 'Hello World!';
@@ -14,7 +14,7 @@ export class AppService {
   giveMeTheDynamoDbClient(): DynamoDBDocumentClient {
     if (this.ddbDocumentClient) return this.ddbDocumentClient;
 
-    let config: DynamoDBClientConfig = null;
+    let config: DynamoDBClientConfig | null = null;
 
     const nonLocalConfig: DynamoDBClientConfig = {
       region: 'eu-west-2',

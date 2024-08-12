@@ -54,4 +54,18 @@ export class MealPlannerService {
 
     return describeTableCommandOutput.Table.ItemCount;
   }
+
+  /**
+   * Gets a specified number of random recipes.
+   * 1. Get the number of recipes in the database
+   * 2. Choose a random number between 1 and the number of recipes in the database
+   * 3. Get the recipe by recipe number
+   *  a) If the recipe does not exist, add the number to the free numbers + try again with a different number (with a max number of attempts)
+   * 4. Continue like this until you have the specified number of recipes makig sure of:
+   *  - having distinct recipe numbers
+   *  - having distinct recipe names
+   */
+  // async getRandomRecipes(
+  //   numberOfRecipes: number,
+  // ): Promise<Record<string, unknown>> {}
 }
