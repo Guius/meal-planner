@@ -44,7 +44,7 @@ async function main(week: string) {
 
   console.log(`✅ Successfully got menu for week ${week}.`);
 
-  let recipeNumber = '0';
+  let recipeNumber = 0;
   /**
    * Each recipe will have a unique number. This number will be used to pick a random recipe.
    * Hence each recipe we have should have a number between 1 and the total number of recipes.
@@ -94,7 +94,7 @@ async function main(week: string) {
       if (freeNumbers.length > 0) {
         const lastItem = freeNumbers.pop();
         if (lastItem) {
-          recipeNumber = lastItem;
+          recipeNumber = parseInt(lastItem);
 
           checkForFreeNumber = true;
           checkForNewNumber = false;
@@ -126,8 +126,12 @@ async function main(week: string) {
           continue;
         }
       } else {
+        console.log(
+          `No free numbers in the database. Starting loop again to check for new recipe number `,
+        );
         checkForFreeNumber = false;
         checkForNewNumber = true;
+        continue;
       }
     } else if (checkForNewNumber) {
       console.log(
@@ -158,17 +162,18 @@ async function main(week: string) {
           if (!res.Items || res.Items.length === 0) {
             return 0;
           } else {
-            if (!res.Items[0].GSI3_sk.S) {
+            if (!res.Items[0].GSI3_sk.N) {
+              console.log(res.Items[0].GSI3_sk);
               console.error(
                 `Found last recipe number but property GSI3_sk does not have S attribute`,
               );
               process.exit(1);
             }
-            return parseInt(res.Items[0].GSI3_sk.S);
+            return parseInt(res.Items[0].GSI3_sk.N);
           }
         });
 
-      recipeNumber = `${lastRecipeNumber + 1}`;
+      recipeNumber = lastRecipeNumber + 1;
       console.log(`New recipe number is ${recipeNumber}`);
     } else if (stayAtCurrentRecipeNumber) {
       console.log(`Stayed at current recipe number ${recipeNumber}`);
@@ -180,7 +185,7 @@ async function main(week: string) {
       checkForFreeNumber = false;
       checkForNewNumber = false;
 
-      recipeNumber = `${+recipeNumber + 1}`;
+      recipeNumber = recipeNumber + 1;
       console.log(`New recipe number is ${recipeNumber}`);
     }
 
@@ -259,4 +264,4 @@ async function main(week: string) {
   );
 }
 
-main('2024-W4');
+main('2024-W10');

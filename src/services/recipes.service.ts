@@ -20,7 +20,9 @@ export class RecipesService {
    * We must fill this. Add it to the list of free numbers.
    * @param recipeNumber
    */
-  async getRecipeByRecipeNumber(recipeNumber: number) {
+  async getRecipeByRecipeNumber(
+    recipeNumber: number,
+  ): Promise<Record<string, unknown> | null> {
     const dynamodbClient = this.appService.giveMeTheDynamoDbClient();
 
     const getRecipeByRecipeNumberCommandInput: QueryCommandInput = {
@@ -28,8 +30,9 @@ export class RecipesService {
       IndexName: 'GSI3',
       ExpressionAttributeValues: {
         ':pk': { S: '#RECIPENUMBERS' },
-        ':sk': { S: `${recipeNumber}` },
+        ':sk': { N: `${recipeNumber}` },
       },
+      KeyConditionExpression: 'GSI3_pk = :pk AND GSI3_sk = :sk',
     };
 
     const result = await dynamodbClient.send(
@@ -49,6 +52,14 @@ export class RecipesService {
         );
         throw new InternalServerErrorException('FREENUMBERUPDATEFAILED');
       }
+    }
+
+    if (!result.Items) {
+      return null;
+    } else if (result.Items.length === 0) {
+      return null;
+    } else {
+      return result.Items[0];
     }
   }
 

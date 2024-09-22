@@ -1,58 +1,59 @@
-import {
-  DescribeTableCommand,
-  DescribeTableCommandInput,
-  DescribeTableCommandOutput,
-} from '@aws-sdk/client-dynamodb';
+import { QueryCommand, QueryCommandInput } from '@aws-sdk/client-dynamodb';
 import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { AppService } from 'src/app.service';
+import { RecipesService } from 'src/services/recipes.service';
 
 @Injectable()
 export class MealPlannerService {
-  constructor(private appService: AppService) {}
+  constructor(
+    private appService: AppService,
+    private recipesService: RecipesService,
+  ) {}
 
   /**
    * Sends a DescribeCommandInput to find out the number of items in the recipes table
    * @returns The number of items in the recipes table
    */
   async getNumberOfRecipes() {
-    const describeTableCommandInput: DescribeTableCommandInput = {
+    const getRecipeNumberCommandInput: QueryCommandInput = {
       TableName: 'recipes',
+      IndexName: 'GSI3',
+      ScanIndexForward: false,
+      Limit: 1,
+      KeyConditionExpression: 'GSI3_pk = :pk',
+      ExpressionAttributeValues: {
+        ':pk': { S: '#RECIPENUMBERS' },
+      },
     };
 
-    const dynamoDBClient = this.appService.giveMeTheDynamoDbClient();
+    /**
+     * If this bombs, then let the script bomb out
+     * There is no point continuing if we cannot get a new recipe number.
+     */
+    const client = this.appService.giveMeTheDynamoDbClient();
+    const lastRecipeNumber = await client
+      .send(new QueryCommand(getRecipeNumberCommandInput))
+      .then((res) => {
+        if (!res.Items || res.Items.length === 0) {
+          return 0;
+        } else {
+          if (!res.Items[0].GSI3_sk.N) {
+            console.log(res.Items[0].GSI3_sk);
+            console.error(
+              `Found last recipe number but property GSI3_sk does not have S attribute`,
+            );
+            process.exit(1);
+          }
+          return parseInt(res.Items[0].GSI3_sk.N);
+        }
+      });
 
-    let describeTableCommandOutput: DescribeTableCommandOutput;
-    try {
-      describeTableCommandOutput = await dynamoDBClient.send(
-        new DescribeTableCommand(describeTableCommandInput),
-      );
-    } catch (error) {
-      Logger.error(
-        `Could not describe table ${describeTableCommandInput.TableName}`,
-      );
-      throw new InternalServerErrorException();
-    }
-
-    Logger.debug(
-      `Successfully described table ${describeTableCommandInput.TableName}.`,
-    );
-
-    if (!describeTableCommandOutput.Table) {
-      Logger.error(
-        `Could not find table ${describeTableCommandInput.TableName}`,
-      );
-      throw new InternalServerErrorException();
-    }
-
-    Logger.debug(
-      `Item count is ${describeTableCommandOutput.Table?.ItemCount}`,
-    );
-
-    return describeTableCommandOutput.Table.ItemCount;
+    return lastRecipeNumber;
   }
 
   /**
@@ -65,7 +66,35 @@ export class MealPlannerService {
    *  - having distinct recipe numbers
    *  - having distinct recipe names
    */
-  // async getRandomRecipes(
-  //   numberOfRecipes: number,
-  // ): Promise<Record<string, unknown>> {}
+  async getRandomRecipes(
+    numberOfRecipes: number,
+  ): Promise<Record<string, unknown>> {
+    const lastRecipeNumber = await this.getNumberOfRecipes();
+    Logger.debug(`Number of recipes in database: ${lastRecipeNumber}`);
+    const randomRecipeNumber = this.randomIntFromInterval(1, lastRecipeNumber);
+    Logger.debug(`Random recipe number selected: ${randomRecipeNumber}`);
+    let randomRecipe: Record<string, unknown>;
+    try {
+      const result = await this.recipesService.getRecipeByRecipeNumber(
+        randomRecipeNumber,
+      );
+      if (!result) {
+        Logger.warn(
+          `No recipe found with recipe number ${randomRecipeNumber}. Try again`,
+        );
+        throw new NotFoundException();
+      }
+      Logger.debug(`Found random recipe!`);
+      randomRecipe = result;
+    } catch (err) {
+      Logger.error(`Failed to get random recipe. Err: ${err}`);
+      throw new InternalServerErrorException();
+    }
+    return randomRecipe;
+  }
+
+  randomIntFromInterval(min, max) {
+    // min and max included
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
 }

@@ -10,6 +10,8 @@ export class MealPlannerController {
     return await this.service.getNumberOfRecipes();
   }
 
-  @Get('random-recipes/:number-of-recipes')
-  async getRandomRecipes(@Param('number-of-recipes') numberOfRecipes: string) {}
+  @Get('random-recipes/:numberOfRecipes')
+  async getRandomRecipes(@Param('numberOfRecipes') numberOfRecipes: number) {
+    return await this.service.getRandomRecipes(numberOfRecipes);
+  }
 }
