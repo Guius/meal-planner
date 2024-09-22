@@ -1,10 +1,5 @@
 import { QueryCommand, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { AppService } from 'src/app.service';
 import { RecipesService } from 'src/services/recipes.service';
 

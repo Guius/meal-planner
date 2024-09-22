@@ -10,8 +10,15 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+import { validate } from 'class-validator';
 import { firstValueFrom } from 'rxjs';
 import { AppService } from 'src/app.service';
+import {
+  Diet,
+  InstructionStep,
+  Nutrition,
+  Recipe,
+} from 'src/entities/recipe.entity';
 
 @Injectable()
 export class ScrapingService {
@@ -83,125 +90,61 @@ export class ScrapingService {
     recipeIdArray.pop();
     const newRecipeId = recipeIdArray.join('-');
 
-    const entity: Record<string, unknown> = {
-      ...recipe,
-      pk: newRecipeId,
-      sk: recipe.totalTime,
-    };
-
-    /**
-     * Add recipe number to GSI3
-     */
-    entity.GSI3_pk = '#RECIPENUMBERS';
-    entity.GSI3_sk = recipeNumber;
-
     // find out if food is vegetarian or vegan
+    let diet: Diet;
+    let intermediateDiet: string;
     if ((recipe.keywords as string[]).includes('Vegan')) {
-      entity.diet = 'Vegan';
+      intermediateDiet = 'Vegan';
     } else if ((recipe.keywords as string[]).includes('Veggie')) {
-      entity.diet = 'Vegetarian';
+      intermediateDiet = 'Vegetarian';
     } else {
-      entity.diet = 'Meat';
+      intermediateDiet = 'Meat';
     }
     // add to meat free gsi
-    if (entity.diet === 'Vegan' || entity.diet === 'Vegetarian') {
-      entity.GSI1_pk = 'Non-Meat';
-      entity.GSI1_sk = entity.sk;
+    if (intermediateDiet === 'Vegan' || intermediateDiet === 'Vegetarian') {
+      diet = Diet.NonMeat;
     } else {
-      entity.GSI1_pk = 'Meat';
-      entity.GSI1_sk = entity.sk;
+      diet = Diet.Meat;
     }
 
-    /**
-     * do gsi for meal type. This is based on the recipe name.
-     * - salad
-     * - curry / masala / tikka / jalfrezzi / laksa / pasanda / biriyani / dahl / dal
-     * - stir-fry
-     * - tacos
-     * - noodles / noodle
-     * - bruschetta
-     * - steak
-     * - burger
-     * - pie
-     * - rice-bowl
-     * - soup
-     * - risotto
-     * - pasta / linguine / tagliatelle / rigatoni / penne / spaghetti / mac-and-cheese etc... --> put all of those in the same
-     * - quesadillas
-     * - stew
-     * - wraps
-     * - gratin
-     * - halloumi
-     *
-     * if the title does not contain any of they key words then make meal type 'Uncategorised'
-     */
-    const title = entity.pk as string;
-    if (title.includes('salad')) {
-      entity.GSI2_pk = 'salad';
-    } else if (
-      // do as many indian dishes as possible
-      title.includes('curry') ||
-      title.includes('masala') ||
-      title.includes('tikka') ||
-      title.includes('jalfrezzi') ||
-      title.includes('laksa') ||
-      title.includes('pasanda') ||
-      title.includes('biriyani') ||
-      title.includes('dal') ||
-      title.includes('dahl') ||
-      title.includes('korma')
-    ) {
-      entity.GSI2_pk = 'curry';
-    } else if (title.includes('stir-fry')) {
-      entity.GSI2_pk = 'stir-fry';
-    } else if (title.includes('tacos')) {
-      entity.GSI2_pk = 'tacos';
-    } else if (
-      title.includes('noodles') ||
-      title.includes('noodle') ||
-      title.includes('ramen')
-    ) {
-      entity.GSI2_pk = 'noodles';
-    } else if (title.includes('bruschetta')) {
-      entity.GSI2_pk = 'bruschetta';
-    } else if (title.includes('steak')) {
-      entity.GSI2_pk = 'steak';
-    } else if (title.includes('burger')) {
-      entity.GSI2_pk = 'burger';
-    } else if (title.includes('pie')) {
-      entity.GSI2_pk = 'pie';
-    } else if (title.includes('rice-bowl')) {
-      entity.GSI2_pk = 'rice-bowl';
-    } else if (title.includes('quesadillas')) {
-      entity.GSI2_pk = 'quesadillas';
-    } else if (title.includes('stew')) {
-      entity.GSI2_pk = 'stew';
-    } else if (title.includes('wrap') || title.includes('wraps')) {
-      entity.GSI2_pk = 'wraps';
-    } else if (title.includes('gratin')) {
-      entity.GSI2_pk = 'gratin';
-    } else if (title.includes('halloumi')) {
-      entity.GSI2_pk = 'halloumi';
-    } else if (title.includes('soup')) {
-      entity.GSI2_pk = 'soup';
-    } else if (title.includes('risotto')) {
-      entity.GSI2_pk = 'risotto';
-    } else if (
-      title.includes('pasta') ||
-      title.includes('linguine') ||
-      title.includes('rigatoni') ||
-      title.includes('tagliatelle') ||
-      title.includes('penne') ||
-      title.includes('spaghetti') ||
-      title.includes('macaroni') ||
-      title.includes('mac-and-cheese')
-    ) {
-      entity.GSI2_pk = 'pasta';
-    } else {
-      entity.GSI2_pk = 'uncategorised';
-    }
+    const nutritionEntity = new Nutrition(
+      (recipe.nutrition as Record<string, string>).calories,
+      (recipe.nutrition as Record<string, string>).carbohydrateContent,
+      (recipe.nutrition as Record<string, string>).cholesterolContent,
+      (recipe.nutrition as Record<string, string>).fatContent,
+      (recipe.nutrition as Record<string, string>).fiberContent,
+      (recipe.nutrition as Record<string, string>).proteinContent,
+      (recipe.nutrition as Record<string, string>).saturatedFatContent,
+      (recipe.nutrition as Record<string, string>).servingSize,
+      (recipe.nutrition as Record<string, string>).sodiumContent,
+      (recipe.nutrition as Record<string, string>).sugarContent,
+    );
 
-    entity.GSI2_sk = entity.sk;
+    const entity = new Recipe(
+      newRecipeId,
+      recipe.description as string,
+      recipe.keywords as string[],
+      nutritionEntity,
+      recipe.recipeCategory as string,
+      recipe.recipeCuisine as string,
+      recipe.recipeIngredient as string[],
+      recipe.recipeInstructions as InstructionStep[],
+      recipe.recipeYield as number,
+      recipe.totalTime as string,
+      recipeNumber,
+      diet,
+    );
+
+    // validate the recipe entity
+    validate(recipe).then((errors) => {
+      // errors is an array of validation errors
+      if (errors.length > 0) {
+        Logger.error('Recipe failed validation. errors: ', errors);
+        throw new InternalServerErrorException();
+      } else {
+        Logger.debug('Validation of recipe succeeded');
+      }
+    });
 
     const putCommandInput: PutCommandInput = {
       Item: entity,
