@@ -66,29 +66,70 @@ export class MealPlannerService {
    */
   async getRandomRecipes(
     numberOfRecipes: number,
-  ): Promise<Record<string, unknown>> {
+  ): Promise<Record<string, unknown>[]> {
+    const recipesSelected: Record<string, unknown>[] = [];
     const lastRecipeNumber = await this.getNumberOfRecipes();
     Logger.debug(`Number of recipes in database: ${lastRecipeNumber}`);
-    const randomRecipeNumber = this.randomIntFromInterval(1, lastRecipeNumber);
-    Logger.debug(`Random recipe number selected: ${randomRecipeNumber}`);
-    let randomRecipe: Record<string, unknown>;
-    try {
-      const result = await this.recipesService.getRecipeByRecipeNumber(
-        randomRecipeNumber,
+
+    /**
+     * We are going to try and get a set of recipes.
+     * We might randomly keep getting the same one.
+     * Or we might keep getting a random number that isn't associated with a recipe
+     *
+     * We don't want this running forever (even though it is very unlikely)
+     * I will cap the number of attempts to fill up the array
+     */
+
+    for (let numberOfAttempts = 0; numberOfAttempts < 50; numberOfAttempts++) {
+      Logger.debug(
+        `Attempt number ${numberOfAttempts}. ${recipesSelected.length} recipes selected so far`,
       );
-      if (!result) {
-        Logger.warn(
-          `No recipe found with recipe number ${randomRecipeNumber}. Try again`,
+
+      const randomRecipeNumber = this.randomIntFromInterval(
+        1,
+        lastRecipeNumber,
+      );
+      Logger.debug(`Random recipe number selected: ${randomRecipeNumber}`);
+
+      let randomRecipe: Record<string, unknown>;
+      try {
+        const result = await this.recipesService.getRecipeByRecipeNumber(
+          randomRecipeNumber,
         );
-        throw new NotFoundException();
+        if (!result) {
+          Logger.warn(
+            `No recipe found with recipe number ${randomRecipeNumber}. Try again`,
+          );
+          continue;
+        }
+        Logger.debug(`Found random recipe!`);
+        randomRecipe = result;
+      } catch (err) {
+        Logger.error(`Failed to get random recipe. Err: ${err}. Trying again.`);
+        continue;
       }
-      Logger.debug(`Found random recipe!`);
-      randomRecipe = result;
-    } catch (err) {
-      Logger.error(`Failed to get random recipe. Err: ${err}`);
-      throw new InternalServerErrorException();
+
+      // check that we don't already have this recipe in the recipes array
+      for (let i = 0; i < recipesSelected.length; i++) {
+        if (randomRecipe.GSI3_sk === recipesSelected[i].GSI3_sk) {
+          Logger.debug(
+            `Random recipe selected has already been selected. Trying again`,
+          );
+          continue;
+        }
+      }
+
+      // push the recipe found to the selected recipes array
+      recipesSelected.push(randomRecipe);
+      Logger.debug(`Filled ${recipesSelected.length} of ${numberOfRecipes}.`);
+
+      // if we have reached the number requested, break out of the loop
+      if (recipesSelected.length >= numberOfRecipes) {
+        break;
+      }
     }
-    return randomRecipe;
+
+    return recipesSelected;
   }
 
   randomIntFromInterval(min, max) {
