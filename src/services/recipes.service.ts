@@ -1,14 +1,13 @@
 import {
-  GetItemCommand,
-  GetItemCommandInput,
-  QueryCommand,
-} from '@aws-sdk/client-dynamodb';
-import {
   PutCommand,
   PutCommandInput,
   QueryCommandInput,
+  GetCommand,
+  GetCommandInput,
+  QueryCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ddbDocumentClient } from 'lib/ddbClient';
 import { AppService } from 'src/app.service';
 
 @Injectable()
@@ -23,19 +22,19 @@ export class RecipesService {
   async getRecipeByRecipeNumber(
     recipeNumber: number,
   ): Promise<Record<string, unknown> | null> {
-    const dynamodbClient = this.appService.giveMeTheDynamoDbClient();
+    const dynamoDBDocumentClient = ddbDocumentClient();
 
     const getRecipeByRecipeNumberCommandInput: QueryCommandInput = {
       TableName: 'recipes',
       IndexName: 'GSI3',
       ExpressionAttributeValues: {
-        ':pk': { S: '#RECIPENUMBERS' },
-        ':sk': { N: `${recipeNumber}` },
+        ':pk': '#RECIPENUMBERS',
+        ':sk': recipeNumber,
       },
       KeyConditionExpression: 'GSI3_pk = :pk AND GSI3_sk = :sk',
     };
 
-    const result = await dynamodbClient.send(
+    const result = await dynamoDBDocumentClient.send(
       new QueryCommand(getRecipeByRecipeNumberCommandInput),
     );
 
@@ -73,26 +72,26 @@ export class RecipesService {
     const dynamodbClient = this.appService.giveMeTheDynamoDbClient();
 
     // Get the free numbers
-    const getFreeNumberCommandInput: GetItemCommandInput = {
+    const getFreeNumberCommandInput: GetCommandInput = {
       Key: {
-        pk: { S: '#FREENUMBERS' },
-        sk: { S: '#FREENUMBERS' },
+        pk: '#FREENUMBERS',
+        sk: '#FREENUMBERS',
       },
       TableName: 'recipes',
       ConsistentRead: true,
     };
 
     const freeNumbers = await dynamodbClient
-      .send(new GetItemCommand(getFreeNumberCommandInput))
+      .send(new GetCommand(getFreeNumberCommandInput))
       .then((res) => {
         if (!res.Item) return [];
-        if (!res.Item.freeNumbers.NS) {
+        if (!res.Item.freeNumbers) {
           console.error(
-            `Found free numbers but it did not have an NS attribute`,
+            `Found free numbers but it did not have free numbers property`,
           );
           throw new InternalServerErrorException();
         }
-        return res.Item.freeNumbers.NS;
+        return res.Item.freeNumbers;
       });
 
     freeNumbers.push(`${freeNumber}`);

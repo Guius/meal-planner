@@ -1,14 +1,12 @@
-import {
-  DynamoDBClient,
-  GetItemCommand,
-  GetItemCommandInput,
-  QueryCommand,
-  QueryCommandInput,
-} from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
   DynamoDBDocumentClient,
   PutCommand,
   PutCommandInput,
+  GetCommand,
+  GetCommandInput,
+  QueryCommand,
+  QueryCommandInput,
 } from '@aws-sdk/lib-dynamodb';
 import { Logger } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
@@ -68,10 +66,10 @@ async function main(week: string) {
       console.debug(`Checking for a free number.`);
       let freeNumbers: string[];
       // Get the free numbers
-      const getFreeNumberCommandInput: GetItemCommandInput = {
+      const getFreeNumberCommandInput: GetCommandInput = {
         Key: {
-          pk: { S: '#FREENUMBERS' },
-          sk: { S: '#FREENUMBERS' },
+          pk: '#FREENUMBERS',
+          sk: '#FREENUMBERS',
         },
         TableName: 'recipes',
         ConsistentRead: true,
@@ -79,10 +77,10 @@ async function main(week: string) {
 
       try {
         freeNumbers = await client
-          .send(new GetItemCommand(getFreeNumberCommandInput))
+          .send(new GetCommand(getFreeNumberCommandInput))
           .then((res) => {
             if (!res.Item) return [];
-            return res.Item.freeNumbers.NS ?? [];
+            return res.Item.freeNumbers ?? [];
           });
       } catch (err) {
         console.error(
@@ -123,7 +121,6 @@ async function main(week: string) {
            * Continue on to the next loop and on the next iteration,
            * we will check again if there is a free number
            */
-          continue;
         }
       } else {
         console.log(
@@ -148,7 +145,7 @@ async function main(week: string) {
         Limit: 1,
         KeyConditionExpression: 'GSI3_pk = :pk',
         ExpressionAttributeValues: {
-          ':pk': { S: '#RECIPENUMBERS' },
+          ':pk': '#RECIPENUMBERS',
         },
       };
 
@@ -162,14 +159,14 @@ async function main(week: string) {
           if (!res.Items || res.Items.length === 0) {
             return 0;
           } else {
-            if (!res.Items[0].GSI3_sk.N) {
+            if (!res.Items[0].GSI3_sk) {
               console.log(res.Items[0].GSI3_sk);
               console.error(
-                `Found last recipe number but property GSI3_sk does not have S attribute`,
+                `Found last recipe number but no property GSI3_sk found`,
               );
               process.exit(1);
             }
-            return parseInt(res.Items[0].GSI3_sk.N);
+            return parseInt(res.Items[0].GSI3_sk);
           }
         });
 
@@ -264,4 +261,4 @@ async function main(week: string) {
   );
 }
 
-main('2024-W10');
+main('2024-W20');

@@ -18,7 +18,6 @@ export class AppService {
 
     const nonLocalConfig: DynamoDBClientConfig = {
       region: 'eu-west-2',
-      apiVersion: '2012-08-10',
     };
 
     config = nonLocalConfig;

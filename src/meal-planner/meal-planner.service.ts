@@ -1,4 +1,4 @@
-import { QueryCommand, QueryCommandInput } from '@aws-sdk/client-dynamodb';
+import { QueryCommand, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
 import {
   Injectable,
   InternalServerErrorException,
@@ -27,7 +27,7 @@ export class MealPlannerService {
       Limit: 1,
       KeyConditionExpression: 'GSI3_pk = :pk',
       ExpressionAttributeValues: {
-        ':pk': { S: '#RECIPENUMBERS' },
+        ':pk': '#RECIPENUMBERS',
       },
     };
 
@@ -42,14 +42,12 @@ export class MealPlannerService {
         if (!res.Items || res.Items.length === 0) {
           return 0;
         } else {
-          if (!res.Items[0].GSI3_sk.N) {
+          if (!res.Items[0].GSI3_sk) {
             console.log(res.Items[0].GSI3_sk);
-            console.error(
-              `Found last recipe number but property GSI3_sk does not have S attribute`,
-            );
+            console.error(`Found last recipe number but no GSI3_sk property`);
             process.exit(1);
           }
-          return parseInt(res.Items[0].GSI3_sk.N);
+          return parseInt(res.Items[0].GSI3_sk);
         }
       });
 
