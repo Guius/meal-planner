@@ -4,65 +4,66 @@ import {
   IsDefined,
   IsEnum,
   IsInt,
+  IsOptional,
   IsPositive,
   IsString,
   ValidateNested,
 } from 'class-validator';
 
 export class Nutrition {
-  @IsDefined()
+  @IsOptional()
   @IsString()
-  calories: string;
-  @IsDefined()
+  calories?: string;
+  @IsOptional()
   @IsString()
-  carbohydrateContent: string;
-  @IsDefined()
+  carbohydrateContent?: string;
+  @IsOptional()
   @IsString()
-  cholesterolContent: string;
-  @IsDefined()
+  cholesterolContent?: string;
+  @IsOptional()
   @IsString()
-  fatContent: string;
-  @IsDefined()
+  fatContent?: string;
+  @IsOptional()
   @IsString()
-  fiberContent: string;
-  @IsDefined()
+  fiberContent?: string;
+  @IsOptional()
   @IsString()
-  proteinContent: string;
-  @IsDefined()
+  proteinContent?: string;
+  @IsOptional()
   @IsString()
-  saturatedFatContent: string;
-  @IsDefined()
+  saturatedFatContent?: string;
+  @IsOptional()
   @IsString()
-  servingSize: string;
-  @IsDefined()
+  servingSize?: string;
+  @IsOptional()
   @IsString()
-  sodiumContent: string;
-  @IsDefined()
+  sodiumContent?: string;
+  @IsOptional()
   @IsString()
-  sugarContent: string;
+  sugarContent?: string;
 
   constructor(
-    calories: string,
-    carbohydrateContent: string,
-    cholesterolContent: string,
-    fatContent: string,
-    fiberContent: string,
-    proteinContent: string,
-    saturatedFatContent: string,
-    servingSize: string,
-    sodiumContent: string,
-    sugarContent: string,
+    calories?: string,
+    carbohydrateContent?: string,
+    cholesterolContent?: string,
+    fatContent?: string,
+    fiberContent?: string,
+    proteinContent?: string,
+    saturatedFatContent?: string,
+    servingSize?: string,
+    sodiumContent?: string,
+    sugarContent?: string,
   ) {
-    this.calories = calories;
-    this.carbohydrateContent = carbohydrateContent;
-    this.cholesterolContent = cholesterolContent;
-    this.fatContent = fatContent;
-    this.fiberContent = fiberContent;
-    this.proteinContent = proteinContent;
-    this.saturatedFatContent = saturatedFatContent;
-    this.servingSize = servingSize;
-    this.sodiumContent = sodiumContent;
-    this.sugarContent = sugarContent;
+    if (calories) this.calories = calories;
+    if (carbohydrateContent) this.carbohydrateContent = carbohydrateContent;
+    if (cholesterolContent) this.cholesterolContent = cholesterolContent;
+    if (fatContent) this.fatContent = fatContent;
+    if (fiberContent) this.fiberContent = fiberContent;
+    if (proteinContent) this.proteinContent = proteinContent;
+    if (saturatedFatContent) this.saturatedFatContent = saturatedFatContent;
+    if (servingSize) this.servingSize = servingSize;
+    if (sodiumContent) this.sodiumContent = sodiumContent;
+    if (sugarContent) this.sugarContent = sugarContent;
   }
 }
 
@@ -140,7 +141,8 @@ export class Recipe {
   recipeIngredient: string[];
   @IsDefined()
   @IsArray()
-  @IsEnum(InstructionStep, { each: true })
+  @ValidateNested({ each: true })
+  @Type(() => InstructionStep)
   recipeInstructions: InstructionStep[];
   @IsDefined()
   @IsInt()

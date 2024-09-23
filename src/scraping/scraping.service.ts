@@ -120,6 +120,21 @@ export class ScrapingService {
       (recipe.nutrition as Record<string, string>).sugarContent,
     );
 
+    const instructions: InstructionStep[] = [];
+
+    for (
+      let i = 0;
+      i < (recipe.recipeInstructions as Record<string, string>[]).length;
+      i++
+    ) {
+      const instructionStep = new InstructionStep(
+        (recipe.recipeInstructions as Record<string, string>[])[i]['@type'],
+        (recipe.recipeInstructions as Record<string, string>[])[i].text,
+      );
+
+      instructions.push(instructionStep);
+    }
+
     const entity = new Recipe(
       newRecipeId,
       recipe.description as string,
@@ -128,7 +143,7 @@ export class ScrapingService {
       recipe.recipeCategory as string,
       recipe.recipeCuisine as string,
       recipe.recipeIngredient as string[],
-      recipe.recipeInstructions as InstructionStep[],
+      instructions,
       recipe.recipeYield as number,
       recipe.totalTime as string,
       recipeNumber,
@@ -136,7 +151,10 @@ export class ScrapingService {
     );
 
     // validate the recipe entity
-    validate(recipe).then((errors) => {
+    validate(entity, {
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }).then((errors) => {
       // errors is an array of validation errors
       if (errors.length > 0) {
         Logger.error('Recipe failed validation. errors: ', errors);
