@@ -9,6 +9,7 @@ import {
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ddbDocumentClient } from 'lib/ddbClient';
 import { AppService } from 'src/app.service';
+import { Recipe } from 'src/entities/recipe.entity';
 
 @Injectable()
 export class RecipesService {
@@ -19,9 +20,7 @@ export class RecipesService {
    * We must fill this. Add it to the list of free numbers.
    * @param recipeNumber
    */
-  async getRecipeByRecipeNumber(
-    recipeNumber: number,
-  ): Promise<Record<string, unknown> | null> {
+  async getRecipeByRecipeNumber(recipeNumber: number): Promise<Recipe | null> {
     const dynamoDBDocumentClient = ddbDocumentClient();
 
     const getRecipeByRecipeNumberCommandInput: QueryCommandInput = {
@@ -58,7 +57,7 @@ export class RecipesService {
     } else if (result.Items.length === 0) {
       return null;
     } else {
-      return result.Items[0];
+      return result.Items[0] as Recipe;
     }
   }
 

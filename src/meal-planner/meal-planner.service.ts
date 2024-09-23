@@ -1,6 +1,7 @@
 import { QueryCommand, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
 import { Injectable, Logger } from '@nestjs/common';
 import { AppService } from 'src/app.service';
+import { Recipe } from 'src/entities/recipe.entity';
 import { RecipesService } from 'src/services/recipes.service';
 
 @Injectable()
@@ -59,10 +60,8 @@ export class MealPlannerService {
    *  - having distinct recipe numbers
    *  - having distinct recipe names
    */
-  async getRandomRecipes(
-    numberOfRecipes: number,
-  ): Promise<Record<string, unknown>[]> {
-    const recipesSelected: Record<string, unknown>[] = [];
+  async getRandomRecipes(numberOfRecipes: number): Promise<Recipe[]> {
+    const recipesSelected: Recipe[] = [];
     const lastRecipeNumber = await this.getNumberOfRecipes();
     Logger.debug(`Number of recipes in database: ${lastRecipeNumber}`);
 
@@ -86,7 +85,7 @@ export class MealPlannerService {
       );
       Logger.debug(`Random recipe number selected: ${randomRecipeNumber}`);
 
-      let randomRecipe: Record<string, unknown>;
+      let randomRecipe: Recipe;
       try {
         const result = await this.recipesService.getRecipeByRecipeNumber(
           randomRecipeNumber,
