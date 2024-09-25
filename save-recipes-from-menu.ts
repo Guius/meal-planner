@@ -261,4 +261,4 @@ async function main(week: string) {
   );
 }
 
-main('2024-W1');
+main('2024-W3');
