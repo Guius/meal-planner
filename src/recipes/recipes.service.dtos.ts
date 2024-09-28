@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsPositive,
   IsString,
+  Min,
   ValidateNested,
 } from 'class-validator';
 
@@ -104,38 +105,13 @@ export class Ingredient {
   }
 }
 
-export class Recipe {
-  @IsDefined()
-  @IsString()
-  pk: string;
-  @IsDefined()
-  @IsString()
-  sk: string;
+export class PutRecipeMethodParams {
   @IsDefined()
   @IsString()
   description: string;
   @IsDefined()
   @IsEnum(Diet)
   diet: Diet;
-  @IsDefined()
-  @IsString()
-  GSI1_pk: string;
-  @IsDefined()
-  @IsString()
-  GSI1_sk: string;
-  @IsDefined()
-  @IsString()
-  GSI2_pk: string;
-  @IsDefined()
-  @IsString()
-  GSI2_sk: string;
-  @IsDefined()
-  @IsString()
-  GSI3_pk: string;
-  @IsDefined()
-  @IsInt()
-  @IsPositive()
-  GSI3_sk: number;
   @IsDefined()
   @IsArray()
   @IsString({ each: true })
@@ -156,7 +132,7 @@ export class Recipe {
   @IsDefined()
   @IsArray()
   @IsString({ each: true })
-  recipeIngredient: string[];
+  recipeIngredient: Ingredient[];
   @IsDefined()
   @IsArray()
   @ValidateNested({ each: true })
@@ -169,6 +145,10 @@ export class Recipe {
   @IsDefined()
   @IsString()
   totalTime: string;
+  @IsDefined()
+  @IsInt()
+  @Min(1)
+  recipeNumber: number;
 
   constructor(
     name: string,
@@ -177,22 +157,14 @@ export class Recipe {
     nutrition: Nutrition,
     recipeCategory: string,
     recipeCuisine: string,
-    recipeIngredient: string[],
+    recipeIngredient: Ingredient[],
     recipeInstructions: InstructionStep[],
     recipeYield: number,
     totalTime: string,
     recipeNumber: number,
     diet: Diet,
   ) {
-    this.pk = name;
-    this.sk = totalTime;
-    this.GSI1_pk = diet;
-    this.GSI1_sk = totalTime;
-    this.GSI2_pk = recipeCuisine;
-    this.GSI2_sk = totalTime;
-    this.GSI3_pk = '#RECIPENUMBERS';
-    this.GSI3_sk = recipeNumber;
-
+    this.recipeNumber = recipeNumber;
     this.description = description;
     this.keywords = keywords;
     this.nutrition = nutrition;
