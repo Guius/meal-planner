@@ -15,6 +15,7 @@ import { firstValueFrom } from 'rxjs';
 import { AppService } from 'src/app.service';
 import {
   Diet,
+  Ingredient,
   InstructionStep,
   Nutrition,
   Recipe,
@@ -235,5 +236,58 @@ export class ScrapingService {
     );
 
     return describeTableCommandOutput.Table.ItemCount;
+  }
+
+  /**
+   * _Update 1 of data
+   * Introducing last updated variable
+   * changing the ingredients from simple string '40 grams Mature Cheddar Cheese' to:
+   * {
+   *  id: #ingredientName#ingredientUnit
+   *  name: ingredientName
+   *  unit: ingredientUnit
+   *  amount: ingredientAmount
+   * }
+   */
+  // async update1() {}
+
+  fromStringToIngredientDto(ingredientString: string): Ingredient {
+    const name = ingredientString.split(' ').slice(2).join(' ');
+    const unit = ingredientString.split(' ').slice(1, 2).join(' ');
+    let amount = ingredientString.split(' ').slice(0, 1).join(' ');
+    const amountSplit = amount.split('');
+
+    if (amountSplit.includes('½')) {
+      amount = `${this.addFractionToAmount(amountSplit, '½', 0.5)}`;
+    } else if (amountSplit.includes('¼')) {
+      amount = `${this.addFractionToAmount(amountSplit, '¼', 0.25)}`;
+    } else if (amountSplit.includes('¾')) {
+      amount = `${this.addFractionToAmount(amountSplit, '¾', 0.75)}`;
+    } else if (amountSplit.includes('⅓')) {
+      amount = `${this.addFractionToAmount(amountSplit, '⅓', 0.333)}`;
+    } else if (amountSplit.includes('⅔')) {
+      amount = `${this.addFractionToAmount(amountSplit, '⅔', 0.666)}`;
+    }
+
+    return {
+      amount: amount,
+      ingredientId: `#${name}#${unit}`,
+      name: name,
+      unit: unit,
+    };
+  }
+
+  addFractionToAmount(
+    amountSplit: string[],
+    fraction: string,
+    numericFraction: number,
+  ): number {
+    amountSplit.pop();
+    const integerPart = parseInt(amountSplit.join(''));
+    if (isNaN(integerPart)) {
+      console.log('ingredient amount not formed as expected');
+      throw new Error();
+    }
+    return integerPart + numericFraction;
   }
 }

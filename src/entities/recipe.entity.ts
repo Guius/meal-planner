@@ -89,6 +89,9 @@ export class InstructionStep {
 export class Ingredient {
   @IsDefined()
   @IsString()
+  ingredientId: string;
+  @IsDefined()
+  @IsString()
   name: string;
   @IsDefined()
   @IsString()
@@ -98,6 +101,7 @@ export class Ingredient {
   amount: string;
 
   constructor(name: string, unit: string, amount: string) {
+    this.ingredientId = `#${name}#${amount}`;
     this.name = name;
     this.unit = unit;
     this.amount = amount;
