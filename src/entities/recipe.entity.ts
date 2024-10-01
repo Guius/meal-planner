@@ -173,6 +173,9 @@ export class Recipe {
   @IsDefined()
   @IsString()
   totalTime: string;
+  @IsDefined()
+  @IsInt()
+  lastUpdated: number;
 
   constructor(
     name: string,
@@ -187,6 +190,7 @@ export class Recipe {
     totalTime: string,
     recipeNumber: number,
     diet: Diet,
+    lastUpdated: number,
   ) {
     this.pk = name;
     this.sk = totalTime;
@@ -208,5 +212,6 @@ export class Recipe {
     this.name = name;
     this.recipeCuisine = recipeCuisine;
     this.totalTime = totalTime;
+    this.lastUpdated = lastUpdated;
   }
 }

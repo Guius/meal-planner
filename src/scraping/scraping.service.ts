@@ -20,12 +20,16 @@ import {
   Nutrition,
   Recipe,
 } from 'src/entities/recipe.entity';
+import { MealPlannerService } from '../services/meal-planner.service';
+import { RecipesService } from '../services/recipes.service';
 
 @Injectable()
 export class ScrapingService {
   constructor(
     private readonly httpService: HttpService,
     private appService: AppService,
+    private mealPlannerService: MealPlannerService,
+    private recipesService: RecipesService,
   ) {}
   async scraping(url: string) {
     try {
@@ -149,6 +153,7 @@ export class ScrapingService {
       recipe.totalTime as string,
       recipeNumber,
       diet,
+      Date.now(),
     );
 
     // validate the recipe entity
@@ -249,7 +254,75 @@ export class ScrapingService {
    *  amount: ingredientAmount
    * }
    */
-  // async update1() {}
+  async update1() {
+    const client = this.appService.giveMeTheDynamoDbClient();
+
+    const failedRecipes: number[] = [];
+
+    // get the number of recipes
+    const numberOfRecipes = await this.mealPlannerService.getNumberOfRecipes();
+    Logger.log(`Starting update1 process for ${numberOfRecipes} recipes`);
+
+    for (let i = 0; i < numberOfRecipes; i++) {
+      Logger.log(`Processing recipe ${i + 1} of ${numberOfRecipes}`);
+      let recipe: Recipe;
+      try {
+        const result = await this.recipesService.getRecipeByRecipeNumber(i);
+        if (!result) {
+          Logger.warn(`Recipe ${i} not found. Skipping.`);
+          continue;
+        }
+        recipe = result;
+        Logger.log(`Successfully retrieved recipe: ${recipe.name}`);
+      } catch (err) {
+        if (err instanceof Error) {
+          Logger.error(`Failed to get recipe ${i}. Error: ${err.message}`);
+        } else {
+          Logger.error(`Failed to get recipe ${i}. Error: ${err}`);
+        }
+        failedRecipes.push(i);
+        continue;
+      }
+
+      const updatedRecipe = this.giveMeTheUpdatedRecipe(recipe);
+      Logger.debug(`Updated recipe: ${JSON.stringify(updatedRecipe)}`);
+
+      // update the recipe
+      const updateCommandInput: PutCommandInput = {
+        Item: updatedRecipe,
+        TableName: 'recipes',
+      };
+
+      try {
+        await client.send(new PutCommand(updateCommandInput));
+        Logger.log(`Successfully updated recipe: ${recipe.name}`);
+      } catch (err) {
+        if (err instanceof Error) {
+          Logger.error(`Failed to update recipe ${i}. Error: ${err.message}`);
+        } else {
+          Logger.error(`Failed to update recipe ${i}. Error: ${err}`);
+        }
+        failedRecipes.push(i);
+      }
+    }
+
+    Logger.log(
+      `Update1 process completed. ${failedRecipes.length} recipes failed to update.`,
+    );
+    if (failedRecipes.length > 0) {
+      Logger.warn(`Failed recipe numbers: ${failedRecipes.join(', ')}`);
+    }
+  }
+
+  giveMeTheUpdatedRecipe(recipe: Recipe): Recipe {
+    recipe.recipeIngredient = recipe.recipeIngredient.map(
+      (ingredient) =>
+        this.fromStringToIngredientDto(ingredient) as unknown as string,
+    );
+    recipe.lastUpdated = Date.now();
+
+    return recipe;
+  }
 
   fromStringToIngredientDto(ingredientString: string): Ingredient {
     const name = ingredientString.split(' ').slice(2).join(' ');
@@ -258,15 +331,20 @@ export class ScrapingService {
     const amountSplit = amount.split('');
 
     if (amountSplit.includes('½')) {
-      amount = `${this.addFractionToAmount(amountSplit, '½', 0.5)}`;
+      console.log('amount included half');
+      amount = `${this.addFractionToAmount(amountSplit, 0.5)}`;
     } else if (amountSplit.includes('¼')) {
-      amount = `${this.addFractionToAmount(amountSplit, '¼', 0.25)}`;
+      console.log('amount included quarter');
+      amount = `${this.addFractionToAmount(amountSplit, 0.25)}`;
     } else if (amountSplit.includes('¾')) {
-      amount = `${this.addFractionToAmount(amountSplit, '¾', 0.75)}`;
+      console.log('amount included three quarters');
+      amount = `${this.addFractionToAmount(amountSplit, 0.75)}`;
     } else if (amountSplit.includes('⅓')) {
-      amount = `${this.addFractionToAmount(amountSplit, '⅓', 0.333)}`;
+      console.log('amount included one third');
+      amount = `${this.addFractionToAmount(amountSplit, 0.333)}`;
     } else if (amountSplit.includes('⅔')) {
-      amount = `${this.addFractionToAmount(amountSplit, '⅔', 0.666)}`;
+      console.log('amount included two thirds');
+      amount = `${this.addFractionToAmount(amountSplit, 0.666)}`;
     }
 
     return {
@@ -277,17 +355,17 @@ export class ScrapingService {
     };
   }
 
-  addFractionToAmount(
-    amountSplit: string[],
-    fraction: string,
-    numericFraction: number,
-  ): number {
+  addFractionToAmount(amountSplit: string[], numericFraction: number): number {
+    // 62½ -> ['6', '2', '½']
     amountSplit.pop();
+    // -> ['6', '2']
     const integerPart = parseInt(amountSplit.join(''));
+    // 62
     if (isNaN(integerPart)) {
       console.log('ingredient amount not formed as expected');
       throw new Error();
     }
+    // 62 + 0.5
     return integerPart + numericFraction;
   }
 }

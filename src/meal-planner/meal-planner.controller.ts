@@ -5,7 +5,7 @@ import {
   Logger,
   Param,
 } from '@nestjs/common';
-import { MealPlannerService } from './meal-planner.service';
+import { MealPlannerService } from '../services/meal-planner.service';
 import { RandomRecipeDto } from './meal-planner.controller.dtos';
 
 @Controller('meal-planner')
