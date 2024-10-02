@@ -18,7 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "scrape:week": "ts-node ./save-recipes-from-menu.ts"
+    "scrape:week": "ts-node ./save-recipes-from-menu.ts",
+    "update1": "ts-node ./update-recipes-1.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.637.0",

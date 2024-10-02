@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { ScrapingService } from './scraping.service';
 
 @Controller('scraping')
@@ -22,5 +22,10 @@ export class ScrapingController {
     @Param('recipeNumber') recipeNumber: number,
   ) {
     return await this.scrapingService.saveRecipe(body, url, +recipeNumber);
+  }
+
+  @Put('update1')
+  async update1() {
+    return await this.scrapingService.update1();
   }
 }

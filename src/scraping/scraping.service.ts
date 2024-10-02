@@ -255,21 +255,26 @@ export class ScrapingService {
    * }
    */
   async update1() {
+    console.log('Doing update 1');
     const client = this.appService.giveMeTheDynamoDbClient();
 
     const failedRecipes: number[] = [];
+    const unknownRecipes: number[] = [];
 
     // get the number of recipes
     const numberOfRecipes = await this.mealPlannerService.getNumberOfRecipes();
     Logger.log(`Starting update1 process for ${numberOfRecipes} recipes`);
 
-    for (let i = 0; i < numberOfRecipes; i++) {
-      Logger.log(`Processing recipe ${i + 1} of ${numberOfRecipes}`);
+    for (let i = 1; i < numberOfRecipes + 1; i++) {
+      // Pause execution for 2 seconds
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      Logger.log(`Processing recipe ${i} of ${numberOfRecipes}`);
       let recipe: Recipe;
       try {
         const result = await this.recipesService.getRecipeByRecipeNumber(i);
         if (!result) {
           Logger.warn(`Recipe ${i} not found. Skipping.`);
+          unknownRecipes.push(i);
           continue;
         }
         recipe = result;
@@ -304,13 +309,19 @@ export class ScrapingService {
         }
         failedRecipes.push(i);
       }
+      if (failedRecipes.length > 0) {
+        Logger.warn(`Failed recipe numbers: ${failedRecipes.join(', ')}`);
+      }
     }
 
     Logger.log(
-      `Update1 process completed. ${failedRecipes.length} recipes failed to update.`,
+      `Update1 process completed. ${failedRecipes.length} recipes failed to update. ${unknownRecipes.length} recipes not found.`,
     );
     if (failedRecipes.length > 0) {
       Logger.warn(`Failed recipe numbers: ${failedRecipes.join(', ')}`);
+    }
+    if (unknownRecipes.length > 0) {
+      Logger.warn(`Unknown recipe numbers: ${unknownRecipes.join(', ')}`);
     }
   }
 
@@ -327,29 +338,35 @@ export class ScrapingService {
   fromStringToIngredientDto(ingredientString: string): Ingredient {
     const name = ingredientString.split(' ').slice(2).join(' ');
     const unit = ingredientString.split(' ').slice(1, 2).join(' ');
+    const ingredientId = `${ingredientString
+      .split(' ')
+      .slice(2)
+      .join('_')}#${unit}`;
     let amount = ingredientString.split(' ').slice(0, 1).join(' ');
     const amountSplit = amount.split('');
 
     if (amountSplit.includes('½')) {
-      console.log('amount included half');
+      Logger.log(`amount included half. Ingredient: ${ingredientString}`);
       amount = `${this.addFractionToAmount(amountSplit, 0.5)}`;
     } else if (amountSplit.includes('¼')) {
-      console.log('amount included quarter');
+      Logger.log(`amount included quarter. Ingredient: ${ingredientString}`);
       amount = `${this.addFractionToAmount(amountSplit, 0.25)}`;
     } else if (amountSplit.includes('¾')) {
-      console.log('amount included three quarters');
+      Logger.log(
+        `amount included three quarters. Ingredient: ${ingredientString}`,
+      );
       amount = `${this.addFractionToAmount(amountSplit, 0.75)}`;
     } else if (amountSplit.includes('⅓')) {
-      console.log('amount included one third');
+      Logger.log(`amount included one third. Ingredient: ${ingredientString}`);
       amount = `${this.addFractionToAmount(amountSplit, 0.333)}`;
     } else if (amountSplit.includes('⅔')) {
-      console.log('amount included two thirds');
+      Logger.log(`amount included two thirds. Ingredient: ${ingredientString}`);
       amount = `${this.addFractionToAmount(amountSplit, 0.666)}`;
     }
 
     return {
       amount: amount,
-      ingredientId: `#${name}#${unit}`,
+      ingredientId: ingredientId,
       name: name,
       unit: unit,
     };
@@ -357,8 +374,13 @@ export class ScrapingService {
 
   addFractionToAmount(amountSplit: string[], numericFraction: number): number {
     // 62½ -> ['6', '2', '½']
+    Logger.log(`amountSplit: ${amountSplit}`);
+    if (amountSplit.length === 1) {
+      return numericFraction;
+    }
     amountSplit.pop();
     // -> ['6', '2']
+    Logger.log(`amountSplit after pop: ${amountSplit}`);
     const integerPart = parseInt(amountSplit.join(''));
     // 62
     if (isNaN(integerPart)) {

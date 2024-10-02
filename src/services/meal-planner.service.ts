@@ -105,6 +105,9 @@ export class MealPlannerService {
 
       // check that we don't already have this recipe in the recipes array
       for (let i = 0; i < recipesSelected.length; i++) {
+        Logger.debug(
+          `Checking if recipe ${randomRecipe.GSI3_sk} already exists in selected recipes. Recipe selected ${i} number: ${recipesSelected[i].GSI3_sk}`,
+        );
         if (randomRecipe.GSI3_sk === recipesSelected[i].GSI3_sk) {
           Logger.debug(
             `Random recipe selected has already been selected. Trying again`,
