@@ -11,6 +11,13 @@ export interface Nutrition {
   sugarContent?: string;
 }
 
+export interface Ingredient {
+  ingredientId: string;
+  name: string;
+  unit: string;
+  amount: string;
+}
+
 export enum Diet {
   NonMeat = 'Non-Meat',
   Meat = 'Meat',
@@ -29,7 +36,7 @@ export interface RandomRecipeDto {
   nutrition: Nutrition;
   recipeCategory: string;
   recipeCuisine: string;
-  recipeIngredient: string[];
+  recipeIngredient: Ingredient[];
   recipeInstructions: InstructionStep[];
   recipeYield: number;
   totalTime: string;

@@ -140,6 +140,15 @@ export class ScrapingService {
       instructions.push(instructionStep);
     }
 
+    const ingredients: Ingredient[] = [];
+
+    for (let i = 0; i < (recipe.recipeIngredient as string[]).length; i++) {
+      const ingredientString = (recipe.recipeIngredient as string[])[i];
+      const ingredient = this.fromStringToIngredientDto(ingredientString);
+
+      ingredients.push(ingredient);
+    }
+
     const entity = new Recipe(
       newRecipeId,
       recipe.description as string,
@@ -147,7 +156,7 @@ export class ScrapingService {
       nutritionEntity,
       recipe.recipeCategory as string,
       recipe.recipeCuisine as string,
-      recipe.recipeIngredient as string[],
+      ingredients,
       instructions,
       recipe.recipeYield as number,
       recipe.totalTime as string,
@@ -241,98 +250,6 @@ export class ScrapingService {
     );
 
     return describeTableCommandOutput.Table.ItemCount;
-  }
-
-  /**
-   * _Update 1 of data
-   * Introducing last updated variable
-   * changing the ingredients from simple string '40 grams Mature Cheddar Cheese' to:
-   * {
-   *  id: #ingredientName#ingredientUnit
-   *  name: ingredientName
-   *  unit: ingredientUnit
-   *  amount: ingredientAmount
-   * }
-   */
-  async update1() {
-    console.log('Doing update 1');
-    const client = this.appService.giveMeTheDynamoDbClient();
-
-    const failedRecipes: number[] = [];
-    const unknownRecipes: number[] = [];
-
-    // get the number of recipes
-    const numberOfRecipes = await this.mealPlannerService.getNumberOfRecipes();
-    Logger.log(`Starting update1 process for ${numberOfRecipes} recipes`);
-
-    for (let i = 1; i < numberOfRecipes + 1; i++) {
-      // Pause execution for 2 seconds
-      await new Promise((resolve) => setTimeout(resolve, 200));
-      Logger.log(`Processing recipe ${i} of ${numberOfRecipes}`);
-      let recipe: Recipe;
-      try {
-        const result = await this.recipesService.getRecipeByRecipeNumber(i);
-        if (!result) {
-          Logger.warn(`Recipe ${i} not found. Skipping.`);
-          unknownRecipes.push(i);
-          continue;
-        }
-        recipe = result;
-        Logger.log(`Successfully retrieved recipe: ${recipe.name}`);
-      } catch (err) {
-        if (err instanceof Error) {
-          Logger.error(`Failed to get recipe ${i}. Error: ${err.message}`);
-        } else {
-          Logger.error(`Failed to get recipe ${i}. Error: ${err}`);
-        }
-        failedRecipes.push(i);
-        continue;
-      }
-
-      const updatedRecipe = this.giveMeTheUpdatedRecipe(recipe);
-      Logger.debug(`Updated recipe: ${JSON.stringify(updatedRecipe)}`);
-
-      // update the recipe
-      const updateCommandInput: PutCommandInput = {
-        Item: updatedRecipe,
-        TableName: 'recipes',
-      };
-
-      try {
-        await client.send(new PutCommand(updateCommandInput));
-        Logger.log(`Successfully updated recipe: ${recipe.name}`);
-      } catch (err) {
-        if (err instanceof Error) {
-          Logger.error(`Failed to update recipe ${i}. Error: ${err.message}`);
-        } else {
-          Logger.error(`Failed to update recipe ${i}. Error: ${err}`);
-        }
-        failedRecipes.push(i);
-      }
-      if (failedRecipes.length > 0) {
-        Logger.warn(`Failed recipe numbers: ${failedRecipes.join(', ')}`);
-      }
-    }
-
-    Logger.log(
-      `Update1 process completed. ${failedRecipes.length} recipes failed to update. ${unknownRecipes.length} recipes not found.`,
-    );
-    if (failedRecipes.length > 0) {
-      Logger.warn(`Failed recipe numbers: ${failedRecipes.join(', ')}`);
-    }
-    if (unknownRecipes.length > 0) {
-      Logger.warn(`Unknown recipe numbers: ${unknownRecipes.join(', ')}`);
-    }
-  }
-
-  giveMeTheUpdatedRecipe(recipe: Recipe): Recipe {
-    recipe.recipeIngredient = recipe.recipeIngredient.map(
-      (ingredient) =>
-        this.fromStringToIngredientDto(ingredient) as unknown as string,
-    );
-    recipe.lastUpdated = Date.now();
-
-    return recipe;
   }
 
   fromStringToIngredientDto(ingredientString: string): Ingredient {
