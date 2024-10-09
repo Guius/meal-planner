@@ -101,7 +101,7 @@ export class Ingredient {
   amount: string;
 
   constructor(name: string, unit: string, amount: string) {
-    this.ingredientId = `${name.split(' ').slice(2).join('_')}#${unit}`;
+    this.ingredientId = `${name.split(' ').join('_')}#${unit}`;
     this.name = name;
     this.unit = unit;
     this.amount = amount;
@@ -158,8 +158,8 @@ export class Recipe {
   @IsString()
   recipeCuisine: string;
   @IsDefined()
-  @IsArray()
-  @IsString({ each: true })
+  @ValidateNested({ each: true })
+  @Type(() => Ingredient)
   recipeIngredient: Ingredient[];
   @IsDefined()
   @IsArray()

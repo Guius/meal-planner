@@ -145,8 +145,11 @@ export class ScrapingService {
     for (let i = 0; i < (recipe.recipeIngredient as string[]).length; i++) {
       const ingredientString = (recipe.recipeIngredient as string[])[i];
       const ingredient = this.fromStringToIngredientDto(ingredientString);
+      console.log(ingredient);
 
-      ingredients.push(ingredient);
+      ingredients.push(
+        new Ingredient(ingredient.name, ingredient.unit, ingredient.amount),
+      );
     }
 
     const entity = new Recipe(

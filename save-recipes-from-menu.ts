@@ -213,8 +213,7 @@ async function main(week: string) {
     // save it to the database
     try {
       console.log(`📝 Saving recipe ${currentRecipe}`);
-      console.error(`need to change script to transform ingredients`);
-      process.exit(1);
+
       const result = await axios.post(
         `http://localhost:3000/scraping/recipe/${currentRecipe}/${recipeNumber}`,
         recipeJson,
@@ -263,4 +262,4 @@ async function main(week: string) {
   );
 }
 
-main('2024-W3');
+main('2024-W45');
