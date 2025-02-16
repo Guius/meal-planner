@@ -175,7 +175,12 @@ export class ScrapingService {
     }).then((errors) => {
       // errors is an array of validation errors
       if (errors.length > 0) {
-        Logger.error('Recipe failed validation. errors: ', errors);
+        Logger.error(
+          `Recipe failed validation. Recipe: ${JSON.stringify(
+            entity,
+          )} errors: `,
+          errors,
+        );
         throw new InternalServerErrorException();
       } else {
         Logger.debug('Validation of recipe succeeded');

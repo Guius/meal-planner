@@ -1,4 +1,5 @@
 import { DynamoDBClient, DynamoDBClientConfig } from '@aws-sdk/client-dynamodb';
+import { SSMClient, SSMClientConfig } from '@aws-sdk/client-ssm';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { Injectable } from '@nestjs/common';
 
@@ -6,6 +7,8 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
   ddbClient: DynamoDBClient | null = null;
   ddbDocumentClient: DynamoDBDocumentClient | null = null;
+
+  ssmClient: SSMClient | null = null;
 
   getHello(): string {
     return 'Hello World!';
@@ -31,5 +34,17 @@ export class AppService {
       },
     });
     return this.ddbDocumentClient;
+  }
+
+  giveMeTheSSMClient() {
+    if (this.ssmClient) return this.ssmClient;
+
+    const config: SSMClientConfig = {
+      region: 'eu-west-2',
+    };
+
+    this.ssmClient = new SSMClient(config);
+
+    return this.ssmClient;
   }
 }

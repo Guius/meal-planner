@@ -1,0 +1,242 @@
+[
+  {
+    "@context": "http://schema.org",
+    "@type": ["Recipe", "NewsArticle"],
+    "headline": "Taquito Casserole",
+    "datePublished": "2024-09-03T15:09:18.866-04:00",
+    "dateModified": "2024-09-03T15:09:18.866-04:00",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Amanda Stanfield",
+        "url": "https://www.allrecipes.com/author/amanda-stanfield/"
+      }
+    ],
+    "description": "This taquito casserole has a creamy base of beans, corn, and cheese, baked with taquitos on top and drizzled with jalapeno crema.",
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://www.allrecipes.com/thmb/Mbn4iM87XkYZ9PGY4OWe7VSCRkM=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/8673259-taquito-casserole-ddmfs-4x3-2-c50d82d59206482f9d9b8f1222b0cc6d.jpg",
+      "height": 1125,
+      "width": 1500
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Allrecipes",
+      "url": "https://www.allrecipes.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.allrecipes.com/thmb/Z9lwz1y0B5aX-cemPiTgpn5YB0k=/112x112/filters:no_upscale():max_bytes(150000):strip_icc()/allrecipes_logo_schema-867c69d2999b439a9eba923a445ccfe3.png",
+        "width": 112,
+        "height": 112
+      },
+      "brand": "Allrecipes",
+      "publishingPrinciples": "https://www.allrecipes.com/about-us-6648102#toc-editorial-guidelines",
+      "sameAs": [
+        "https://www.facebook.com/allrecipes",
+        "https://www.instagram.com/allrecipes/",
+        "https://www.pinterest.com/allrecipes/",
+        "https://www.tiktok.com/@allrecipes",
+        "https://www.youtube.com/user/allrecipes/videos",
+        "https://twitter.com/Allrecipes",
+        "https://flipboard.com/@Allrecipes",
+        "https://en.wikipedia.org/wiki/Allrecipes.com",
+        "http://linkedin.com/company/allrecipes.com"
+      ]
+    },
+    "name": "Taquito Casserole",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5",
+      "ratingCount": "2"
+    },
+    "cookTime": "PT50M",
+    "nutrition": {
+      "@type": "NutritionInformation",
+      "calories": "800 kcal",
+      "carbohydrateContent": "82 g",
+      "cholesterolContent": "91 mg",
+      "fiberContent": "11 g",
+      "proteinContent": "33 g",
+      "saturatedFatContent": "17 g",
+      "sodiumContent": "2078 mg",
+      "sugarContent": "13 g",
+      "fatContent": "39 g",
+      "unsaturatedFatContent": "0 g"
+    },
+    "prepTime": "PT20M",
+    "recipeCategory": ["Dinner", "Entree"],
+    "recipeCuisine": ["Mexican"],
+    "recipeIngredient": [
+      "Cooking spray",
+      "1 (19 ounce) can mild red enchilada sauce",
+      "1 (15 ounce) can black beans, drained and rinsed",
+      "2 1/2 cups frozen corn",
+      "1 (8.8 ounce) package pre-cooked microwavable white rice",
+      "1 cup finely chopped  red bell pepper",
+      "1/2 cup finely chopped red onion",
+      "1/2 cup heavy whipping cream",
+      "1 (1 ounce) envelope mild taco seasoning",
+      "1 1/2 teaspoon kosher salt",
+      "1 teaspoon smoked paprika",
+      "1 teaspoon ground cumin",
+      "16 ounces pre-shredded Mexican cheese blend, divided",
+      "20 frozen beef and cheese flour tortilla taquitos",
+      "1/2 cup sour cream",
+      "2 tablespoons fresh lime juice",
+      "2 tablespoon pickling liquid from jarred pickled jalapenos",
+      "2 tablespoon drained pickled jalapeños slices",
+      "1/4 cup loosely packed fresh cilantro leaves"
+    ],
+    "recipeInstructions": [
+      {
+        "@type": "HowToStep",
+        "image": [
+          {
+            "@type": "ImageObject",
+            "url": "https://www.allrecipes.com/thmb/yDNfxvykNNn1zxyrVJ_5pIvefC0=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/8673259-taquito-casserole-ddmfs-ingredients-41eb426194d146e1a6f80520e704eb79.jpg"
+          }
+        ],
+        "text": "Gather all ingredients. Preheat the oven to 375 degrees F (190 degrees C). Lightly coat a 9x13-inch baking dish with cooking spray; set aside."
+      },
+      {
+        "@type": "HowToStep",
+        "image": [
+          {
+            "@type": "ImageObject",
+            "url": "https://www.allrecipes.com/thmb/3F0xAqthct6zN8LNwqfmhG7Xuwg=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/8673259-taquito-casserole-ddmfs-step02-a4557162193440339839c288cc77a16d.jpg"
+          }
+        ],
+        "text": "Stir together enchilada sauce, beans, corn, rice, bell pepper, red onion, cream, taco seasoning, salt, paprika, cumin, and 3 cups shredded cheese in a large bowl until well combined."
+      },
+      {
+        "@type": "HowToStep",
+        "image": [
+          {
+            "@type": "ImageObject",
+            "url": "https://www.allrecipes.com/thmb/73udSh1Q45FVSgZYzX-twyREhb4=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/8673259-taquito-casserole-ddmfs-step04-163a5e3d0a7f43408dbd21edf790ad23.jpg"
+          }
+        ],
+        "text": "Spread into the prepared baking dish in an even layer. Arrange taquitos evenly over rice mixture."
+      },
+      {
+        "@type": "HowToStep",
+        "image": [
+          {
+            "@type": "ImageObject",
+            "url": "https://www.allrecipes.com/thmb/LnQ3eTJx7ccn7v9glxDDFwUeRvE=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/8673259-taquito-casserole-ddmfs-step05-4b503469c233401c93a3f22313752543.jpg"
+          }
+        ],
+        "text": "Bake in the preheated oven until taquitos are crispy and rice mixture is bubbling, about 40 minutes."
+      },
+      {
+        "@type": "HowToStep",
+        "image": [
+          {
+            "@type": "ImageObject",
+            "url": "https://www.allrecipes.com/thmb/q7LqBCbP2oSP22Ft0o9td1SHY-E=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/8673259-taquito-casserole-ddmfs-step07-f104abcd86cd4f479a4524b6b4263fb9.jpg"
+          }
+        ],
+        "text": "Meanwhile, whisk together sour cream, lime juice, and pickling liquid in a small bowl until smooth. Set aside, uncovered, at room temperature until ready to serve."
+      },
+      {
+        "@type": "HowToStep",
+        "image": [
+          {
+            "@type": "ImageObject",
+            "url": "https://www.allrecipes.com/thmb/7akySvFFsgM7yfJ9nKLSmW-K7fE=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/8673259-taquito-casserole-ddmfs-step06-f8a6d1b7752f41f6bcdb45bf7ad79e6d.jpg"
+          }
+        ],
+        "text": "Remove baking dish from oven, and sprinkle evenly with remaining cheese. Top evenly with jalapeño slices. Bake at 375 degrees F (190 degrees C) until cheese is melted, about 8 minutes more."
+      },
+      {
+        "@type": "HowToStep",
+        "image": [
+          {
+            "@type": "ImageObject",
+            "url": "https://www.allrecipes.com/thmb/Mbn4iM87XkYZ9PGY4OWe7VSCRkM=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/8673259-taquito-casserole-ddmfs-4x3-2-c50d82d59206482f9d9b8f1222b0cc6d.jpg"
+          }
+        ],
+        "text": "Let stand for 10 minutes. Top evenly with cilantro leaves. Drizzle each serving with jalapeño crema."
+      }
+    ],
+    "recipeYield": ["8"],
+    "totalTime": "PT80M",
+    "review": [
+      {
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Allrecipes Member"
+        },
+        "reviewBody": "Easier and faster than ordering takeout.",
+        "datePublished": "2024-10-04T16:13:28.125Z"
+      },
+      {
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "luv2cook24"
+        },
+        "reviewBody": "Can this be made in the Microwave I am limited to no stove. Microwave and slow cooker is all I have. I haven't tried this yet due to cooking limitations. I know, though, that I will love it. I love taquitos",
+        "datePublished": "2024-09-06T22:16:49.228Z"
+      }
+    ],
+    "mainEntityOfPage": {
+      "@type": ["WebPage"],
+      "@id": "https://www.allrecipes.com/taquito-casserole-recipe-8673259",
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "item": {
+              "@id": "https://www.allrecipes.com/recipes/237/world-cuisine/latin-american/",
+              "name": "Latin American"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "item": {
+              "@id": "https://www.allrecipes.com/recipes/728/world-cuisine/latin-american/mexican/",
+              "name": "Mexican"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "item": {
+              "@id": "https://www.allrecipes.com/recipes/17504/world-cuisine/latin-american/mexican/main-dishes/",
+              "name": "Main Dishes"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "item": {
+              "@id": "https://www.allrecipes.com/recipes/17499/world-cuisine/latin-american/mexican/main-dishes/casserole/",
+              "name": "Casserole"
+            }
+          }
+        ]
+      },
+      "reviewedBy": [
+        {
+          "@type": "Person",
+          "name": "Melissa Gray",
+          "url": "https://www.allrecipes.com/author/melissa-gray/"
+        }
+      ],
+      "lastReviewed": "2024-09-03T15:09:18.866-04:00"
+    }
+  }
+]
