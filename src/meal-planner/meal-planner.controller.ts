@@ -1,9 +1,11 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
   Logger,
   Param,
+  Post,
 } from '@nestjs/common';
 import { MealPlannerService } from '../services/meal-planner.service';
 import { RandomRecipeDto } from './meal-planner.controller.dtos';
@@ -44,5 +46,10 @@ export class MealPlannerController {
       };
     });
     return result;
+  }
+
+  @Post('send-recipes-in-email')
+  async sendRecipesInEmail(@Body() body: RandomRecipeDto[]) {
+    await this.service.sendSelectedRecipesByEmail(body);
   }
 }

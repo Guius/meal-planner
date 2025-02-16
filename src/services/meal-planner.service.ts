@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AppService } from 'src/app.service';
 import { Recipe } from 'src/entities/recipe.entity';
 import { RecipesService } from 'src/services/recipes.service';
+import { RandomRecipeDto } from '../meal-planner/meal-planner.controller.dtos';
 
 @Injectable()
 export class MealPlannerService {
@@ -129,8 +130,37 @@ export class MealPlannerService {
     return recipesSelected;
   }
 
+  async sendSelectedRecipesByEmail(recipeSelection: RandomRecipeDto[]) {
+    const transporter = await this.appService.giveMeTheNodemailerTransporter();
+
+    let html = '<h1>Your selected recipes:</h1><hr />';
+    for (let i = 0; i < recipeSelection.length; i++) {
+      html += `<h2>${this.prettifyRecipeName(recipeSelection[i].name)}</h2>`;
+    }
+
+    try {
+      const info = await transporter.sendMail({
+        from: '"Guillaume Vitry" <glmvb261@gmail.com>', // sender address
+        to: 'glmvb261@gmail.com', // list of receivers
+        subject: '🧑‍🍳 Recipe Selection', // Subject line
+        text: 'HTML rendering error', // plain text body
+        html: html, // html body
+      });
+      console.log('Message sent: %s', info.messageId);
+    } catch (err) {
+      console.error(`Error sending email. Err: ${err}`);
+    }
+  }
+
   randomIntFromInterval(min, max) {
     // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
+  prettifyRecipeName(name: string): string {
+    return (
+      name.split('-').join(' ').charAt(0).toUpperCase() +
+      name.split('-').join(' ').slice(1).toLowerCase()
+    );
   }
 }
