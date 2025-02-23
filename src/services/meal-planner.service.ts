@@ -4,6 +4,8 @@ import { AppService } from 'src/app.service';
 import { Recipe } from 'src/entities/recipe.entity';
 import { RecipesService } from 'src/services/recipes.service';
 import { RandomRecipeDto } from '../meal-planner/meal-planner.controller.dtos';
+import * as PDFDocument from 'pdfkit';
+import * as fs from 'node:fs';
 
 @Injectable()
 export class MealPlannerService {
@@ -162,5 +164,56 @@ export class MealPlannerService {
       name.split('-').join(' ').charAt(0).toUpperCase() +
       name.split('-').join(' ').slice(1).toLowerCase()
     );
+  }
+
+  async generateRecipeSelectionPDF(recipes: RandomRecipeDto[]) {
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
+
+    doc.pipe(fs.createWriteStream('./pdf-documents/recipe-selection.pdf'));
+
+    doc.fillColor('#EAFAF2');
+
+    // Styling
+    doc
+      .fillColor('#333')
+      .font('Helvetica-Bold')
+      .fontSize(32)
+      .text('Meal plan', {
+        align: 'center',
+      });
+
+    doc.moveDown(1);
+
+    const meals = [
+      'Creamy harissa chicken spaghetti',
+      'Creamy harissa chicken spaghetti',
+      'Creamy harissa chicken spaghetti',
+      'Creamy harissa chicken spaghetti',
+      'Creamy harissa chicken spaghetti',
+    ];
+
+    meals.forEach((meal, index) => {
+      doc
+        .roundedRect(50, 100 + index * 80, 500, 60, 10)
+        .fill('#DAF0EE')
+        .stroke();
+      doc
+        .fontSize(14)
+        .font('Helvetica-Bold')
+        .fillColor('#000')
+        .text(meal, 60, 115 + index * 80);
+      // doc
+      //   .fontSize(10)
+      //   .font('Helvetica')
+      //   .fillColor('#666')
+      //   .text('PREP TIME 25 MINS', 400, 115 + index * 80);
+      doc.roundedRect(440, 118 + index * 80, 50, 20, 5).fill('#c0e0d0');
+      doc
+        .fontSize(10)
+        .fillColor('#333')
+        .text('Meat', 450, 123 + index * 80);
+    });
+
+    doc.end();
   }
 }

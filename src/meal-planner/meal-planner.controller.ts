@@ -52,4 +52,9 @@ export class MealPlannerController {
   async sendRecipesInEmail(@Body() body: RandomRecipeDto[]) {
     await this.service.sendSelectedRecipesByEmail(body);
   }
+
+  @Post('write-recipes-to-pdf')
+  async writeRecipesToPdf(@Body() body: RandomRecipeDto[]) {
+    await this.service.generateRecipeSelectionPDF(body);
+  }
 }
