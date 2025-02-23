@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meal Plan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Knewave&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Knewave&display=swap');
+
+      .bubblegum-sans-regular {
+        font-family: 'Bubblegum Sans', serif;
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      .knewave-regular {
+        font-family: 'Knewave', serif;
+        font-weight: 400;
+        font-style: normal;
+        color: #3b413c;
+      }
+
+      body {
+        background-color: #eafaf2;
+        margin: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        border-radius: 10px;
+        padding: 20px;
+      }
+      .header {
+        background: #94d1be;
+        border: solid 2px #3b413c;
+        padding: 20px;
+        border-radius: 0 0 10px 10px;
+        text-align: left;
+        font-size: 35px;
+        font-weight: bold;
+        margin: -20px;
+      }
+      .meal-list {
+        margin-top: 40px;
+      }
+      .meal {
+        background: #dff3eb;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 20px;
+        border: 2px solid black;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .meal-info {
+        font-size: 18px;
+      }
+      .meal-info .title {
+        font-weight: bold;
+        color: #3b413c;
+      }
+      .meal-info .time {
+        font-size: 14px;
+        color: #6a6a6a;
+      }
+      .tag {
+        background: #94d1be;
+        color: #3b413c;
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-size: 14px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body class="bubblegum-sans-regular">
+    <div class="container">
+      <div class="header knewave-regular">Meal Plan</div>
+      <div class="meal-list">
+        {{ MEAL_LIST }}
+      </div>
+    </div>
+  </body>
+</html>

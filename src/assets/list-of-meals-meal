@@ -1,0 +1,7 @@
+<div class="meal">
+  <div class="meal-info">
+    <div class="title">{{ TITLE }}</div>
+    <div class="time">{{ PREP_TIME }}</div>
+  </div>
+  <div class="tag">{{ DIET }}</div>
+</div>

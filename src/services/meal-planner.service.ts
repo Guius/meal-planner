@@ -4,7 +4,6 @@ import { AppService } from 'src/app.service';
 import { Recipe } from 'src/entities/recipe.entity';
 import { RecipesService } from 'src/services/recipes.service';
 import { RandomRecipeDto } from '../meal-planner/meal-planner.controller.dtos';
-import * as PDFDocument from 'pdfkit';
 import * as fs from 'node:fs';
 
 @Injectable()
@@ -167,53 +166,26 @@ export class MealPlannerService {
   }
 
   async generateRecipeSelectionPDF(recipes: RandomRecipeDto[]) {
-    const doc = new PDFDocument({ size: 'A4', margin: 50 });
+    let listOfMeals = '';
+    const mealTemplateBuffer = fs.readFileSync(
+      './src/assets/list-of-meals-meal',
+    );
+    const mealTemplate = mealTemplateBuffer.toString();
 
-    doc.pipe(fs.createWriteStream('./pdf-documents/recipe-selection.pdf'));
+    const mealPlanBuffer = fs.readFileSync('./src/assets/meal-plan');
+    let mealPlan = mealPlanBuffer.toString();
 
-    doc.fillColor('#EAFAF2');
+    for (let i = 0; i < recipes.length; i++) {
+      const currentMealTemplate = mealTemplate;
+      const currentMeal = currentMealTemplate.replace(
+        '{{ TITLE }}',
+        this.prettifyRecipeName(recipes[i].name),
+      );
+      listOfMeals = listOfMeals.concat(currentMeal);
+    }
 
-    // Styling
-    doc
-      .fillColor('#333')
-      .font('Helvetica-Bold')
-      .fontSize(32)
-      .text('Meal plan', {
-        align: 'center',
-      });
-
-    doc.moveDown(1);
-
-    const meals = [
-      'Creamy harissa chicken spaghetti',
-      'Creamy harissa chicken spaghetti',
-      'Creamy harissa chicken spaghetti',
-      'Creamy harissa chicken spaghetti',
-      'Creamy harissa chicken spaghetti',
-    ];
-
-    meals.forEach((meal, index) => {
-      doc
-        .roundedRect(50, 100 + index * 80, 500, 60, 10)
-        .fill('#DAF0EE')
-        .stroke();
-      doc
-        .fontSize(14)
-        .font('Helvetica-Bold')
-        .fillColor('#000')
-        .text(meal, 60, 115 + index * 80);
-      // doc
-      //   .fontSize(10)
-      //   .font('Helvetica')
-      //   .fillColor('#666')
-      //   .text('PREP TIME 25 MINS', 400, 115 + index * 80);
-      doc.roundedRect(440, 118 + index * 80, 50, 20, 5).fill('#c0e0d0');
-      doc
-        .fontSize(10)
-        .fillColor('#333')
-        .text('Meat', 450, 123 + index * 80);
-    });
-
-    doc.end();
+    mealPlan = mealPlan.replace('{{ MEAL_LIST }}', listOfMeals);
+    console.log(mealPlan);
+    fs.writeFileSync('./src/assets/meal-plan.html', mealPlan);
   }
 }
