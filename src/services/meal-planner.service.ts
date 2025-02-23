@@ -1,9 +1,16 @@
 import { QueryCommand, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { AppService } from 'src/app.service';
 import { Recipe } from 'src/entities/recipe.entity';
 import { RecipesService } from 'src/services/recipes.service';
-import { RandomRecipeDto } from '../meal-planner/meal-planner.controller.dtos';
+import {
+  Diet,
+  RandomRecipeDto,
+} from '../meal-planner/meal-planner.controller.dtos';
 import * as fs from 'node:fs';
 
 @Injectable()
@@ -132,12 +139,16 @@ export class MealPlannerService {
   }
 
   async sendSelectedRecipesByEmail(recipeSelection: RandomRecipeDto[]) {
+    try {
+      await this.generateRecipeSelectionHTMLDoc(recipeSelection);
+    } catch (err) {
+      console.error(`Error generating recipe html. Err: ${err}`);
+      throw new InternalServerErrorException();
+    }
+
     const transporter = await this.appService.giveMeTheNodemailerTransporter();
 
-    let html = '<h1>Your selected recipes:</h1><hr />';
-    for (let i = 0; i < recipeSelection.length; i++) {
-      html += `<h2>${this.prettifyRecipeName(recipeSelection[i].name)}</h2>`;
-    }
+    const html = '<h1>⬇️ Download your selected recipes:</h1>';
 
     try {
       const info = await transporter.sendMail({
@@ -146,6 +157,13 @@ export class MealPlannerService {
         subject: '🧑‍🍳 Recipe Selection', // Subject line
         text: 'HTML rendering error', // plain text body
         html: html, // html body
+        attachments: [
+          {
+            filename: 'meal-plan.html',
+            path: './src/assets/meal-plan.html',
+            contentType: 'text/html',
+          },
+        ],
       });
       console.log('Message sent: %s', info.messageId);
     } catch (err) {
@@ -165,7 +183,11 @@ export class MealPlannerService {
     );
   }
 
-  async generateRecipeSelectionPDF(recipes: RandomRecipeDto[]) {
+  prettifyPrepTime(prepTime: string): string {
+    return prepTime.split('T')[1].split('M')[0] + ' minutes';
+  }
+
+  async generateRecipeSelectionHTMLDoc(recipes: RandomRecipeDto[]) {
     let listOfMeals = '';
     const mealTemplateBuffer = fs.readFileSync(
       './src/assets/list-of-meals-meal',
@@ -176,10 +198,17 @@ export class MealPlannerService {
     let mealPlan = mealPlanBuffer.toString();
 
     for (let i = 0; i < recipes.length; i++) {
-      const currentMealTemplate = mealTemplate;
-      const currentMeal = currentMealTemplate.replace(
+      let currentMeal = mealTemplate.replace(
         '{{ TITLE }}',
         this.prettifyRecipeName(recipes[i].name),
+      );
+      currentMeal = currentMeal.replace(
+        '{{ PREP_TIME }}',
+        this.prettifyPrepTime(recipes[i].totalTime),
+      );
+      currentMeal = currentMeal.replace(
+        '{{ DIET }}',
+        recipes[i].diet === Diet.NonMeat ? 'Veggie' : 'Meat',
       );
       listOfMeals = listOfMeals.concat(currentMeal);
     }

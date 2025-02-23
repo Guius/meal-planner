@@ -55,6 +55,6 @@ export class MealPlannerController {
 
   @Post('write-recipes-to-pdf')
   async writeRecipesToPdf(@Body() body: RandomRecipeDto[]) {
-    await this.service.generateRecipeSelectionPDF(body);
+    await this.service.generateRecipeSelectionHTMLDoc(body);
   }
 }
