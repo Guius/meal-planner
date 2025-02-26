@@ -138,9 +138,15 @@ export class MealPlannerService {
     return recipesSelected;
   }
 
-  async sendSelectedRecipesByEmail(recipeSelection: RandomRecipeDto[]) {
+  async sendSelectedRecipesByEmail(
+    recipeSelection: RandomRecipeDto[],
+    ingredientsList: string[],
+  ) {
     try {
-      await this.generateRecipeSelectionHTMLDoc(recipeSelection);
+      await this.generateRecipeSelectionHTMLDoc(
+        recipeSelection,
+        ingredientsList,
+      );
     } catch (err) {
       console.error(`Error generating recipe html. Err: ${err}`);
       throw new InternalServerErrorException();
@@ -187,7 +193,12 @@ export class MealPlannerService {
     return prepTime.split('T')[1].split('M')[0] + ' minutes';
   }
 
-  async generateRecipeSelectionHTMLDoc(recipes: RandomRecipeDto[]) {
+  async generateRecipeSelectionHTMLDoc(
+    recipes: RandomRecipeDto[],
+    ingredientsList: string[],
+  ) {
+    console.log('>>>>');
+    console.log(recipes);
     let listOfMeals = '';
     const mealTemplateBuffer = fs.readFileSync(
       './src/assets/list-of-meals-meal',
@@ -212,8 +223,21 @@ export class MealPlannerService {
       );
       listOfMeals = listOfMeals.concat(currentMeal);
     }
-
     mealPlan = mealPlan.replace('{{ MEAL_LIST }}', listOfMeals);
+
+    // ------ INGREDIENTS PAGE ------ //
+    const ingredientTemplateBuffer = fs.readFileSync('./src/assets/ingredient');
+    const ingredientTemplate = ingredientTemplateBuffer.toString();
+    let ingredientListHTML = '';
+    for (let i = 0; i < ingredientsList.length; i++) {
+      const currentIngredient = ingredientTemplate.replace(
+        '{{ INGREDIENT }}',
+        ingredientsList[i],
+      );
+      ingredientListHTML = ingredientListHTML.concat(currentIngredient);
+    }
+    mealPlan = mealPlan.replace('{{ INGREDIENT_LIST }}', ingredientListHTML);
+
     console.log(mealPlan);
     fs.writeFileSync('./src/assets/meal-plan.html', mealPlan);
   }

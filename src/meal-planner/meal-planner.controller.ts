@@ -8,7 +8,10 @@ import {
   Post,
 } from '@nestjs/common';
 import { MealPlannerService } from '../services/meal-planner.service';
-import { RandomRecipeDto } from './meal-planner.controller.dtos';
+import {
+  GenerateAndSendHTMLRequest,
+  RandomRecipeDto,
+} from './meal-planner.controller.dtos';
 
 @Controller('meal-planner')
 export class MealPlannerController {
@@ -49,12 +52,18 @@ export class MealPlannerController {
   }
 
   @Post('send-recipes-in-email')
-  async sendRecipesInEmail(@Body() body: RandomRecipeDto[]) {
-    await this.service.sendSelectedRecipesByEmail(body);
+  async sendRecipesInEmail(@Body() body: GenerateAndSendHTMLRequest) {
+    await this.service.sendSelectedRecipesByEmail(
+      body.randomRecipes,
+      body.ingredientsList,
+    );
   }
 
   @Post('write-recipes-to-pdf')
-  async writeRecipesToPdf(@Body() body: RandomRecipeDto[]) {
-    await this.service.generateRecipeSelectionHTMLDoc(body);
+  async writeRecipesToPdf(@Body() body: GenerateAndSendHTMLRequest) {
+    await this.service.generateRecipeSelectionHTMLDoc(
+      body.randomRecipes,
+      body.ingredientsList,
+    );
   }
 }

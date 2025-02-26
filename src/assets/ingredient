@@ -1,0 +1,4 @@
+<div class="ingredient-info">
+  <div class="title">{{ INGREDIENT }}</div>
+  <br />
+</div>

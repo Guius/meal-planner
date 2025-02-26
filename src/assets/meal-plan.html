@@ -36,17 +36,24 @@
         border-radius: 10px;
         padding: 20px;
       }
+      .page {
+        height: 100vh;
+      }
       .header {
         background: #94d1be;
         /* border: solid 2px #3b413c; */
         box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
           rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-        padding: 20px;
+        padding: 10px;
         border-radius: 10px;
         text-align: center;
-        font-size: 45px;
+        font-size: 32px;
         font-weight: bold;
         /* margin: -20px; */
+      }
+      .html-title {
+        padding: 20px;
+        font-size: 45px;
       }
       .meal-list {
         margin-top: 40px;
@@ -82,11 +89,30 @@
         font-size: 14px;
         font-weight: bold;
       }
+      .ingredient-list{
+        background: #dff3eb;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 20px;
+        /* border: 2px solid black; */
+        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+          rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+        display: block;
+        align-items: left;
+      }
+      .ingredient-info {
+        font-size: 18px;
+      }
+      .ingredient-info .title {
+        font-weight: bold;
+        color: #3b413c;
+      }
     </style>
   </head>
   <body class="bubblegum-sans-regular">
     <div class="container">
-      <div class="header knewave-regular">Meal Plan</div>
+    <div class="page">
+      <div class="header knewave-regular html-title">Meal Plan</div>
       <div class="meal-list">
         <div class="meal">
   <div class="meal-info">
@@ -124,6 +150,29 @@
   <div class="tag">Meat</div>
 </div>
 
+      </div>
+      </div>
+      <div class="page">
+        <div class="header knewave-regular">Ingredients</div>
+        <div class="ingredient-list">
+          <div class="ingredient-info">
+  <div class="title">10g of anchovies</div>
+  <br />
+</div>
+<div class="ingredient-info">
+  <div class="title">30g of butter</div>
+  <br />
+</div>
+<div class="ingredient-info">
+  <div class="title">1g of garlic</div>
+  <br />
+</div>
+<div class="ingredient-info">
+  <div class="title">20g of sugar</div>
+  <br />
+</div>
+
+        </div>
       </div>
     </div>
   </body>
