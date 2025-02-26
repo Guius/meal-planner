@@ -27,7 +27,7 @@
       }
 
       body {
-        background-color: #eafaf2;
+        background-color: #e7f7ef;
         margin: 0;
       }
       .container {
@@ -38,13 +38,15 @@
       }
       .header {
         background: #94d1be;
-        border: solid 2px #3b413c;
+        /* border: solid 2px #3b413c; */
+        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+          rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
         padding: 20px;
-        border-radius: 0 0 10px 10px;
-        text-align: left;
-        font-size: 35px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 45px;
         font-weight: bold;
-        margin: -20px;
+        /* margin: -20px; */
       }
       .meal-list {
         margin-top: 40px;
@@ -52,9 +54,11 @@
       .meal {
         background: #dff3eb;
         padding: 15px;
-        margin: 10px 0;
+        margin: 20px 0;
         border-radius: 20px;
-        border: 2px solid black;
+        /* border: 2px solid black; */
+        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+          rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
         display: flex;
         justify-content: space-between;
         align-items: center;
