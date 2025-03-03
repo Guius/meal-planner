@@ -1,6 +1,3 @@
 <div class="page">
   <div class="header knewave-regular">{{ RECIPE_NAME }}</div>
-  <div class="ingredient-list">
-    {{ INGREDIENT_LIST }}
-  </div>
 </div>

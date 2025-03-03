@@ -238,6 +238,19 @@ export class MealPlannerService {
     }
     mealPlan = mealPlan.replace('{{ INGREDIENT_LIST }}', ingredientListHTML);
 
+    // ------ RECIPES ------ //
+    const recipeTemplateBuffer = fs.readFileSync('./src/assets/recipe');
+    const recipeTemplate = recipeTemplateBuffer.toString();
+    let recipesHTML = '';
+    for (let i = 0; i < recipes.length; i++) {
+      const currentRecipe = recipeTemplate.replace(
+        '{{ RECIPE_NAME }}',
+        this.prettifyRecipeName(recipes[i].name),
+      );
+      recipesHTML = recipesHTML.concat(currentRecipe);
+    }
+    mealPlan = mealPlan.replace('{{ RECIPES }}', recipesHTML);
+
     console.log(mealPlan);
     fs.writeFileSync('./src/assets/meal-plan.html', mealPlan);
   }
