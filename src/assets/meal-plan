@@ -89,7 +89,7 @@
         font-size: 14px;
         font-weight: bold;
       }
-      .ingredient-list{
+      .ingredient-list {
         background: #dff3eb;
         padding: 15px;
         margin: 20px 0;
@@ -111,11 +111,11 @@
   </head>
   <body class="bubblegum-sans-regular">
     <div class="container">
-    <div class="page">
-      <div class="header knewave-regular html-title">Meal Plan</div>
-      <div class="meal-list">
-        {{ MEAL_LIST }}
-      </div>
+      <div class="page">
+        <div class="header knewave-regular html-title">Meal Plan</div>
+        <div class="meal-list">
+          {{ MEAL_LIST }}
+        </div>
       </div>
       <div class="page">
         <div class="header knewave-regular">Ingredients</div>
@@ -123,6 +123,7 @@
           {{ INGREDIENT_LIST }}
         </div>
       </div>
+      {{ RECIPES }}
     </div>
   </body>
 </html>
