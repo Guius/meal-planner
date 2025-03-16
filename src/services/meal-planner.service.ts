@@ -197,8 +197,6 @@ export class MealPlannerService {
     recipes: RandomRecipeDto[],
     ingredientsList: string[],
   ) {
-    console.log('>>>>');
-    console.log(recipes);
     let listOfMeals = '';
     const mealTemplateBuffer = fs.readFileSync(
       './src/assets/list-of-meals-meal',
@@ -224,6 +222,7 @@ export class MealPlannerService {
       listOfMeals = listOfMeals.concat(currentMeal);
     }
     mealPlan = mealPlan.replace('{{ MEAL_LIST }}', listOfMeals);
+    console.log(mealPlan);
 
     // ------ INGREDIENTS PAGE ------ //
     const ingredientTemplateBuffer = fs.readFileSync('./src/assets/ingredient');
@@ -251,7 +250,6 @@ export class MealPlannerService {
     }
     mealPlan = mealPlan.replace('{{ RECIPES }}', recipesHTML);
 
-    console.log(mealPlan);
     fs.writeFileSync('./src/assets/meal-plan.html', mealPlan);
   }
 }

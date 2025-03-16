@@ -53,6 +53,7 @@ export class MealPlannerController {
 
   @Post('send-recipes-in-email')
   async sendRecipesInEmail(@Body() body: GenerateAndSendHTMLRequest) {
+    console.log(body.randomRecipes);
     await this.service.sendSelectedRecipesByEmail(
       body.randomRecipes,
       body.ingredientsList,
