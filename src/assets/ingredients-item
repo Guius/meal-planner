@@ -1,0 +1,3 @@
+<div class="ingredient-item">
+  <p class="ingredient-text kalam">{{ INGREDIENT }}</p>
+</div>

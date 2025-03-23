@@ -214,13 +214,27 @@ export class MealPlannerService {
         '{{ DIET_CLASS }}',
         recipes[i].diet === 'Non-Meat' ? 'veggie' : 'meatie',
       );
-      console.log('>>>');
-      console.log(current);
       paletteItems.push(current);
     }
 
-    const palette = paletteItems.join();
+    const palette = paletteItems.join(' ');
     mealPlan = mealPlan.replace('{{PALETTE_ITEMS}}', palette);
+
+    // INGREDIENTS
+    const ingredientItemTemplate = fs
+      .readFileSync('./src/assets/ingredients-item')
+      .toString();
+
+    const ingredients: string[] = [];
+    for (let i = 0; i < ingredientsList.length; i++) {
+      const current = ingredientItemTemplate.replace(
+        '{{ INGREDIENT }}',
+        ingredientsList[i],
+      );
+      ingredients.push(current);
+    }
+    const ingredientsHTML = ingredients.join(' ');
+    mealPlan = mealPlan.replace('{{INGREDIENTS_LIST}}', ingredientsHTML);
 
     fs.writeFileSync('./src/assets/meal-plan.html', mealPlan);
   }
