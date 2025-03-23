@@ -4,143 +4,66 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Meal Plan</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Knewave&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Ubuntu+Sans+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Knewave&display=swap');
 
-      .bubblegum-sans-regular {
-        font-family: 'Bubblegum Sans', serif;
-        font-weight: 400;
-        font-style: normal;
-      }
-
-      .knewave-regular {
-        font-family: 'Knewave', serif;
-        font-weight: 400;
-        font-style: normal;
-        color: #3b413c;
-      }
+    .ubuntu-sans-mono {
+      font-family: "Ubuntu Sans Mono", monospace;
+      font-optical-sizing: auto;
+      font-weight: 100;
+      font-style: normal;
+    }
+    
+    .kalam {
+      font-family: "Kalam", cursive;
+      font-style: normal;
+    }
 
       body {
-        background-color: #e7f7ef;
-        margin: 0;
-      }
-      .container {
-        max-width: 600px;
-        margin: auto;
-        border-radius: 10px;
-        padding: 20px;
-      }
-      .page {
-        height: 100vh;
-      }
-      .header {
-        background: #94d1be;
-        /* border: solid 2px #3b413c; */
-        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-          rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-        padding: 10px;
-        border-radius: 10px;
-        text-align: center;
-        font-size: 32px;
-        font-weight: bold;
-        /* margin: -20px; */
-      }
-      .html-title {
-        padding: 20px;
-        font-size: 45px;
-      }
-      .meal-list {
-        margin-top: 40px;
-      }
-      .meal {
-        background: #dff3eb;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 20px;
-        /* border: 2px solid black; */
-        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-          rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .meal-info {
-        font-size: 18px;
-      }
-      .meal-info .title {
-        font-weight: bold;
-        color: #3b413c;
-      }
-      .meal-info .time {
-        font-size: 14px;
-        color: #6a6a6a;
-      }
-      .tag {
-        background: #94d1be;
-        color: #3b413c;
-        padding: 5px 15px;
-        border-radius: 15px;
-        font-size: 14px;
-        font-weight: bold;
-      }
-      .ingredient-list {
-        background: #dff3eb;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 20px;
-        /* border: 2px solid black; */
-        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-          rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-        display: block;
-        align-items: left;
-      }
-      .ingredient-info {
-        font-size: 18px;
-      }
-      .ingredient-info .title {
-        font-weight: bold;
-        color: #3b413c;
+        background-color: #f5f5f5;
+        margin: 20px;
       }
 
-      .recipe-step {
-        background: #dff3eb;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 20px;
-        /* border: 2px solid black; */
-        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-          rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-        display: block;
-        align-items: left;
+      .title {
+        text-transform: uppercase;
       }
-      .step-title {
-        padding: 10px;
-        font-size: 32px;
-        font-weight: bold;
+
+      .header {
+        text-transform: uppercase;
+        font-size: medium;
       }
+
+      .content {
+        margin: 30px;
+        margin-top: 50px;
+      }
+
+      .palette-item {
+        background: #F7AA8F;
+        min-height: 160px;
+        display: flex;
+        align-items: end;
+      }
+
+      .palette-text {
+        margin: 10px;
+        text-transform: uppercase;
+        font-weight: 800;
+        font-size: x-large;
+      }
+      
     </style>
-  </head>
-  <body class="bubblegum-sans-regular">
-    <div class="container">
-      <div class="page">
-        <div class="header knewave-regular html-title">Meal Plan</div>
-        <div class="meal-list">
-          {{ MEAL_LIST }}
-        </div>
+    </head>
+    <body>
+    <h1 class="ubuntu-sans-mono header">MEAL PLANNER / PALETTE</h1>
+    <h1 class="ubuntu-sans-mono title">PALETTE</h1>
+    <div class="content">
+      <div class="palette-item">
+        <p class="palette-text ubuntu-sans-mono">CREAMY CHICKEN AND MUSHROOM FILO PIE</p>
       </div>
-      <div class="page">
-        <div class="header knewave-regular">Ingredients</div>
-        <div class="ingredient-list">
-          {{ INGREDIENT_LIST }}
-        </div>
-      </div>
-      {{ RECIPES }}
     </div>
-  </body>
+    </body>
+
 </html>

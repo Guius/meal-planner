@@ -4,307 +4,66 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Meal Plan</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Knewave&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Ubuntu+Sans+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Knewave&display=swap');
 
-      .bubblegum-sans-regular {
-        font-family: 'Bubblegum Sans', serif;
-        font-weight: 400;
-        font-style: normal;
-      }
-
-      .knewave-regular {
-        font-family: 'Knewave', serif;
-        font-weight: 400;
-        font-style: normal;
-        color: #3b413c;
-      }
+    .ubuntu-sans-mono {
+      font-family: "Ubuntu Sans Mono", monospace;
+      font-optical-sizing: auto;
+      font-weight: 100;
+      font-style: normal;
+    }
+    
+    .kalam {
+      font-family: "Kalam", cursive;
+      font-style: normal;
+    }
 
       body {
-        background-color: #e7f7ef;
-        margin: 0;
+        background-color: #f5f5f5;
+        margin: 20px;
       }
-      .container {
-        max-width: 600px;
-        margin: auto;
-        border-radius: 10px;
-        padding: 20px;
+
+      .title {
+        text-transform: uppercase;
       }
-      .page {
-        height: 100vh;
-      }
+
       .header {
-        background: #94d1be;
-        /* border: solid 2px #3b413c; */
-        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-          rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-        padding: 10px;
-        border-radius: 10px;
-        text-align: center;
-        font-size: 32px;
-        font-weight: bold;
-        /* margin: -20px; */
+        text-transform: uppercase;
+        font-size: medium;
       }
-      .html-title {
-        padding: 20px;
-        font-size: 45px;
+
+      .content {
+        margin: 30px;
+        margin-top: 50px;
       }
-      .meal-list {
-        margin-top: 40px;
-      }
-      .meal {
-        background: #dff3eb;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 20px;
-        /* border: 2px solid black; */
-        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-          rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+
+      .palette-item {
+        background: #F7AA8F;
+        min-height: 160px;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .meal-info {
-        font-size: 18px;
-      }
-      .meal-info .title {
-        font-weight: bold;
-        color: #3b413c;
-      }
-      .meal-info .time {
-        font-size: 14px;
-        color: #6a6a6a;
-      }
-      .tag {
-        background: #94d1be;
-        color: #3b413c;
-        padding: 5px 15px;
-        border-radius: 15px;
-        font-size: 14px;
-        font-weight: bold;
-      }
-      .ingredient-list {
-        background: #dff3eb;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 20px;
-        /* border: 2px solid black; */
-        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-          rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-        display: block;
-        align-items: left;
-      }
-      .ingredient-info {
-        font-size: 18px;
-      }
-      .ingredient-info .title {
-        font-weight: bold;
-        color: #3b413c;
+        align-items: end;
       }
 
-      .recipe-step {
-        background: #dff3eb;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 20px;
-        /* border: 2px solid black; */
-        box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-          rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
-        display: block;
-        align-items: left;
+      .palette-text {
+        margin: 10px;
+        text-transform: uppercase;
+        font-weight: 800;
+        font-size: x-large;
       }
-      .step-title {
-        padding: 10px;
-        font-size: 32px;
-        font-weight: bold;
-      }
-    </style>
-  </head>
-  <body class="bubblegum-sans-regular">
-    <div class="container">
-      <div class="page">
-        <div class="header knewave-regular html-title">Meal Plan</div>
-        <div class="meal-list">
-          
-        </div>
-      </div>
-      <div class="page">
-        <div class="header knewave-regular">Ingredients</div>
-        <div class="ingredient-list">
-          <div class="ingredient-info">
-  <div class="title">Jasmine Rice - 300 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Green Beans - 240 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Carrot - 1 unit(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Rice Vinegar - 15 milliliter(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Vegetable Gyoza - 1 pack(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Sliced Mushrooms - 80 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Teriyaki Sauce - 75 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Hot Sauce - 30 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Roasted White Sesame Seeds - 10 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Mayonnaise - 4 tbsp</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Potatoes - 900 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Lime - 2 unit(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Mint - 1 bunch(es)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Breadcrumbs - 50 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Thai Style Spice Blend - 2 sachet(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">British Chicken Thighs - 4 unit(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">King Prawns - 300 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Red Thai Style Paste - 100 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Honey - 15 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Coleslaw Mix - 120 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Egg - 1 unit(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Butternut Squash - 1 unit(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Curry Powder Mix - 1 sachet(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Garlic Clove - 5 unit(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Mature Cheddar Cheese - 30 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Korma Curry Paste - 50 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Tomato Puree - 30 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Creme Fraiche - 150 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Vegetable Stock Paste - 10 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Baby Spinach - 40 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Coconut Milk - 180 milliliter(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Soy Sauce - 15 milliliter(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Balsamic Vinegar - 12 milliliter(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Salmon Fillets - 2 unit(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Pesto - 32 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Baby Plum Tomatoes - 125 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Gnocchi - 300 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Serrano Ham - 2 slice(s)</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Sun-Dried Tomato Paste - 25 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Parmigiano Reggiano - 20 grams</div>
-  <br />
-</div>
-<div class="ingredient-info">
-  <div class="title">Wild Rocket - 40 grams</div>
-  <br />
-</div>
-
-        </div>
-      </div>
       
+    </style>
+    </head>
+    <body>
+    <h1 class="ubuntu-sans-mono header">MEAL PLANNER / PALETTE</h1>
+    <h1 class="ubuntu-sans-mono title">PALETTE</h1>
+    <div class="content">
+      <div class="palette-item">
+        <p class="palette-text ubuntu-sans-mono">CREAMY CHICKEN AND MUSHROOM FILO PIE</p>
+      </div>
     </div>
-  </body>
+    </body>
+
 </html>

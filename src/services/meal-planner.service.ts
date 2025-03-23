@@ -197,58 +197,8 @@ export class MealPlannerService {
     recipes: RandomRecipeDto[],
     ingredientsList: string[],
   ) {
-    let listOfMeals = '';
-    const mealTemplateBuffer = fs.readFileSync(
-      './src/assets/list-of-meals-meal',
-    );
-    const mealTemplate = mealTemplateBuffer.toString();
-
     const mealPlanBuffer = fs.readFileSync('./src/assets/meal-plan');
-    let mealPlan = mealPlanBuffer.toString();
-
-    for (let i = 0; i < recipes.length; i++) {
-      let currentMeal = mealTemplate.replace(
-        '{{ TITLE }}',
-        this.prettifyRecipeName(recipes[i].name),
-      );
-      currentMeal = currentMeal.replace(
-        '{{ PREP_TIME }}',
-        this.prettifyPrepTime(recipes[i].totalTime),
-      );
-      currentMeal = currentMeal.replace(
-        '{{ DIET }}',
-        recipes[i].diet === Diet.NonMeat ? 'Veggie' : 'Meat',
-      );
-      listOfMeals = listOfMeals.concat(currentMeal);
-    }
-    mealPlan = mealPlan.replace('{{ MEAL_LIST }}', listOfMeals);
-    console.log(mealPlan);
-
-    // ------ INGREDIENTS PAGE ------ //
-    const ingredientTemplateBuffer = fs.readFileSync('./src/assets/ingredient');
-    const ingredientTemplate = ingredientTemplateBuffer.toString();
-    let ingredientListHTML = '';
-    for (let i = 0; i < ingredientsList.length; i++) {
-      const currentIngredient = ingredientTemplate.replace(
-        '{{ INGREDIENT }}',
-        ingredientsList[i],
-      );
-      ingredientListHTML = ingredientListHTML.concat(currentIngredient);
-    }
-    mealPlan = mealPlan.replace('{{ INGREDIENT_LIST }}', ingredientListHTML);
-
-    // ------ RECIPES ------ //
-    const recipeTemplateBuffer = fs.readFileSync('./src/assets/recipe');
-    const recipeTemplate = recipeTemplateBuffer.toString();
-    let recipesHTML = '';
-    for (let i = 0; i < recipes.length; i++) {
-      const currentRecipe = recipeTemplate.replace(
-        '{{ RECIPE_NAME }}',
-        this.prettifyRecipeName(recipes[i].name),
-      );
-      recipesHTML = recipesHTML.concat(currentRecipe);
-    }
-    mealPlan = mealPlan.replace('{{ RECIPES }}', recipesHTML);
+    const mealPlan = mealPlanBuffer.toString();
 
     fs.writeFileSync('./src/assets/meal-plan.html', mealPlan);
   }
