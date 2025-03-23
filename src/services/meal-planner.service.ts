@@ -198,7 +198,29 @@ export class MealPlannerService {
     ingredientsList: string[],
   ) {
     const mealPlanBuffer = fs.readFileSync('./src/assets/meal-plan');
-    const mealPlan = mealPlanBuffer.toString();
+    let mealPlan = mealPlanBuffer.toString();
+
+    const paletteItemTemplate = fs
+      .readFileSync('./src/assets/palette-item')
+      .toString();
+
+    const paletteItems: string[] = [];
+    for (let i = 0; i < recipes.length; i++) {
+      let current = paletteItemTemplate.replace(
+        '{{ TITLE }}',
+        this.prettifyRecipeName(recipes[i].name),
+      );
+      current = current.replace(
+        '{{ DIET_CLASS }}',
+        recipes[i].diet === 'Non-Meat' ? 'veggie' : 'meatie',
+      );
+      console.log('>>>');
+      console.log(current);
+      paletteItems.push(current);
+    }
+
+    const palette = paletteItems.join();
+    mealPlan = mealPlan.replace('{{PALETTE_ITEMS}}', palette);
 
     fs.writeFileSync('./src/assets/meal-plan.html', mealPlan);
   }

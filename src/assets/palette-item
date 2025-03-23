@@ -1,0 +1,5 @@
+<div class="palette-item {{ DIET_CLASS }}">
+  <p class="palette-text ubuntu-sans-mono">
+    {{ TITLE }}
+  </p>
+</div>

@@ -45,14 +45,24 @@
         min-height: 160px;
         display: flex;
         align-items: end;
+        margin-bottom: 20px;
       }
 
       .palette-text {
         margin: 10px;
         text-transform: uppercase;
-        font-weight: 800;
+        font-weight: 600;
         font-size: x-large;
       }
+
+      .veggie {
+        background-color: #a89f75;
+      }
+      
+      .meatie {
+        background-color: #f7aa8f;
+      }
+      
       
     </style>
     </head>
@@ -60,9 +70,7 @@
     <h1 class="ubuntu-sans-mono header">MEAL PLANNER / PALETTE</h1>
     <h1 class="ubuntu-sans-mono title">PALETTE</h1>
     <div class="content">
-      <div class="palette-item">
-        <p class="palette-text ubuntu-sans-mono">CREAMY CHICKEN AND MUSHROOM FILO PIE</p>
-      </div>
+      {{PALETTE_ITEMS}}
     </div>
     </body>
 
