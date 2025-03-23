@@ -159,7 +159,7 @@ export class MealPlannerService {
     try {
       const info = await transporter.sendMail({
         from: '"Guillaume Vitry" <glmvb261@gmail.com>', // sender address
-        to: 'glmvb261@gmail.com', // list of receivers
+        to: 'glmvb261@gmail.com, lowrilewis@outlook.com', // list of receivers
         subject: '🧑‍🍳 Recipe Selection', // Subject line
         text: 'HTML rendering error', // plain text body
         html: html, // html body
