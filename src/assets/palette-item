@@ -2,4 +2,6 @@
   <p class="palette-text ubuntu-sans-mono">
     {{ TITLE }}
   </p>
+  <br />
+  <p class="prep-time ubuntu-sans-mono">{{ PREP_TIME }}</p>
 </div>

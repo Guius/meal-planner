@@ -211,6 +211,10 @@ export class MealPlannerService {
         this.prettifyRecipeName(recipes[i].name),
       );
       current = current.replace(
+        '{{ PREP_TIME }}',
+        this.prettifyPrepTime(recipes[i].totalTime),
+      );
+      current = current.replace(
         '{{ DIET_CLASS }}',
         recipes[i].diet === 'Non-Meat' ? 'veggie' : 'meatie',
       );
@@ -218,7 +222,7 @@ export class MealPlannerService {
     }
 
     const palette = paletteItems.join(' ');
-    mealPlan = mealPlan.replace('{{PALETTE_ITEMS}}', palette);
+    mealPlan = mealPlan.replace('{{ PALETTE_ITEMS }}', palette);
 
     // INGREDIENTS
     const ingredientItemTemplate = fs
@@ -234,7 +238,7 @@ export class MealPlannerService {
       ingredients.push(current);
     }
     const ingredientsHTML = ingredients.join(' ');
-    mealPlan = mealPlan.replace('{{INGREDIENTS_LIST}}', ingredientsHTML);
+    mealPlan = mealPlan.replace('{{ INGREDIENTS_LIST }}', ingredientsHTML);
 
     fs.writeFileSync('./src/assets/meal-plan.html', mealPlan);
   }

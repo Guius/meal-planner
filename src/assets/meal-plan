@@ -4,22 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Meal Plan</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Ubuntu+Sans+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Ubuntu+Sans+Mono:ital,wght@0,400..700;1,400..700&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      .ubuntu-sans-mono {
+        font-family: 'Ubuntu Sans Mono', monospace;
+        font-optical-sizing: auto;
+        font-weight: 100;
+        font-style: normal;
+      }
 
-    .ubuntu-sans-mono {
-      font-family: "Ubuntu Sans Mono", monospace;
-      font-optical-sizing: auto;
-      font-weight: 100;
-      font-style: normal;
-    }
-    
-    .kalam {
-      font-family: "Kalam", cursive;
-      font-style: normal;
-    }
+      .kalam {
+        font-family: 'Kalam', cursive;
+        font-style: normal;
+      }
 
       body {
         background-color: #f5f5f5;
@@ -45,7 +47,7 @@
       }
 
       .palette-item {
-        background: #F7AA8F;
+        background: #f7aa8f;
         min-height: 160px;
         display: flex;
         align-items: end;
@@ -60,17 +62,24 @@
         font-size: x-large;
       }
 
+      .prep-time {
+        margin: 10px;
+        text-transform: uppercase;
+        font-weight: 300;
+        font-size: medium;
+      }
+
       .veggie {
         background-color: #a89f75;
       }
-      
+
       .meatie {
         background-color: #f7aa8f;
       }
 
       .ingredient-item {
         width: 100%;
-        border-bottom: 2px solid #D0D0D0;
+        border-bottom: 2px solid #d0d0d0;
       }
 
       .ingredient-text {
@@ -84,28 +93,25 @@
       .page {
         min-height: 100vh;
       }
-      
-      
     </style>
-    </head>
-    <body>
-      <div class="page">
-        <h1 class="ubuntu-sans-mono header">MEAL PLANNER / PALETTE</h1>
-        <h1 class="ubuntu-sans-mono title">PALETTE</h1>
-        <div class="content">
-          {{PALETTE_ITEMS}}
-        </div>
+  </head>
+  <body>
+    <div class="page">
+      <h1 class="ubuntu-sans-mono header">MEAL PLANNER / PALETTE</h1>
+      <h1 class="ubuntu-sans-mono title">PALETTE</h1>
+      <div class="content">
+        {{ PALETTE_ITEMS }}
       </div>
-      <br />
-      <br />
-      <br />
-      <div class="page">
+    </div>
+    <br />
+    <br />
+    <br />
+    <div class="page">
       <h1 class="ubuntu-sans-mono header">MEAL PLANNER / INGREDIENTS</h1>
-        <h1 class="ubuntu-sans-mono title">INGREDIENTS</h1>
-        <div class="content-ingredients">
-          {{INGREDIENTS_LIST}}
-        </div>
+      <h1 class="ubuntu-sans-mono title">INGREDIENTS</h1>
+      <div class="content-ingredients">
+        {{ INGREDIENTS_LIST }}
       </div>
-    </body>
-
+    </div>
+  </body>
 </html>
