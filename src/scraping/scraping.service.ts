@@ -152,6 +152,13 @@ export class ScrapingService {
       );
     }
 
+    /**
+     * Recipe cuisine can be 0 (presumably if there is no recipe cuisine).
+     * In that case, let's save it as a string of "0" so that we can search for all recipes
+     * without any cuisine
+     */
+    if (recipe.recipeCuisine === 0) recipe.recipeCuisine = '0';
+
     const entity = new Recipe(
       newRecipeId,
       recipe.description as string,

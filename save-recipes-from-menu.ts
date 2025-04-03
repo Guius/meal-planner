@@ -262,4 +262,4 @@ async function main(week: string) {
   );
 }
 
-main('2025-W1');
+main('2025-W10');
