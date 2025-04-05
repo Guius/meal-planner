@@ -30,6 +30,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/typeorm": "^11.0.0",
     "@types/nodemailer": "^6.4.17",
     "@types/pdfkit": "^0.13.9",
     "axios": "^1.6.8",
@@ -38,7 +39,8 @@
     "nodemailer": "^6.10.0",
     "pdfkit": "^0.16.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "typeorm": "^0.3.22"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

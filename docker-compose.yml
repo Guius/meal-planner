@@ -1,0 +1,20 @@
+version: '3.0'
+
+services:
+  database:
+    image: mysql:8.0.29
+    platform: linux/amd64
+    container_name: 'mealPlanner_mysql8.0.29'
+    restart: always
+    ports:
+      - '3306:3306'
+    command: --init-file /data/application/init.sql
+    volumes:
+      - ./init.sql:/data/application/init.sql
+    environment:
+      MYSQL_ROOT_USER: 'root'
+      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_DATABASE: 'mealPlanner'
+
+volumes:
+  smtp4dev-data:
