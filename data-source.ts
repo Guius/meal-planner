@@ -8,7 +8,9 @@ export default new DataSource({
   password: process.env.DATABASE_PASSWORD
     ? process.env.DATABASE_PASSWORD
     : 'password',
-  database: process.env.DATABASE_NAME ? process.env.DATABASE_NAME : 'neptune',
+  database: process.env.DATABASE_NAME
+    ? process.env.DATABASE_NAME
+    : 'mealPlanner',
   entities: ['src/entities/*.entity.ts'],
   migrations: ['src/migrations/*.ts'],
   logging: ['query'],
