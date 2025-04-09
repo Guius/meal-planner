@@ -3,7 +3,6 @@ import {
   DescribeTableCommandInput,
   DescribeTableCommandOutput,
 } from '@aws-sdk/client-dynamodb';
-import { PutCommand, PutCommandInput } from '@aws-sdk/lib-dynamodb';
 import { HttpService } from '@nestjs/axios';
 import {
   Injectable,
@@ -19,9 +18,17 @@ import {
   InstructionStep,
   Nutrition,
   Recipe,
-} from 'src/entities/recipe.entity';
+} from '../lib/recipe-validation.dtos';
+import {
+  Recipe as RecipeEntity,
+  Ingredient as IngredientEntity,
+  InstructionStep as InstructionStepEntity,
+  Nutrition as NutritionEntity,
+} from '../entities/recipe.entity';
 import { MealPlannerService } from '../services/meal-planner.service';
 import { RecipesService } from '../services/recipes.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, DataSource } from 'typeorm';
 
 @Injectable()
 export class ScrapingService {
@@ -30,6 +37,15 @@ export class ScrapingService {
     private appService: AppService,
     private mealPlannerService: MealPlannerService,
     private recipesService: RecipesService,
+    @InjectRepository(Recipe)
+    private readonly recipeRepository: Repository<RecipeEntity>,
+    @InjectRepository(IngredientEntity)
+    private readonly ingredientRepository: Repository<IngredientEntity>,
+    @InjectRepository(InstructionStepEntity)
+    private readonly instructionStepRepository: Repository<InstructionStepEntity>,
+    @InjectRepository(NutritionEntity)
+    private readonly nutritionRepository: Repository<NutritionEntity>,
+    private dataSource: DataSource,
   ) {}
   async scraping(url: string) {
     try {
@@ -85,8 +101,6 @@ export class ScrapingService {
     recipeId: string,
     recipeNumber: number,
   ): Promise<boolean> {
-    const client = this.appService.giveMeTheDynamoDbClient();
-
     /**
      * The title is in format: speedy-bulgogi-chicken-noodles-65cb875708f1b9082fbcc57f
      * We want to remove the salt at the end
@@ -112,7 +126,7 @@ export class ScrapingService {
       diet = Diet.Meat;
     }
 
-    const nutritionEntity = new Nutrition(
+    const n = new Nutrition(
       (recipe.nutrition as Record<string, string>).calories,
       (recipe.nutrition as Record<string, string>).carbohydrateContent,
       (recipe.nutrition as Record<string, string>).cholesterolContent,
@@ -159,11 +173,11 @@ export class ScrapingService {
      */
     if (recipe.recipeCuisine === 0) recipe.recipeCuisine = '0';
 
-    const entity = new Recipe(
+    const r = new Recipe(
       newRecipeId,
       recipe.description as string,
       recipe.keywords as string[],
-      nutritionEntity,
+      n,
       recipe.recipeCategory as string,
       recipe.recipeCuisine as string,
       ingredients,
@@ -176,7 +190,7 @@ export class ScrapingService {
     );
 
     // validate the recipe entity
-    validate(entity, {
+    validate(r, {
       whitelist: true,
       forbidNonWhitelisted: true,
     }).then((errors) => {
@@ -194,35 +208,69 @@ export class ScrapingService {
       }
     });
 
-    const putCommandInput: PutCommandInput = {
-      Item: entity,
-      TableName: 'recipes',
-      ConditionExpression: `attribute_not_exists(pk) and attribute_not_exists(sk)`,
-    };
+    // convert the validation objects into sql entities
+    const nutritionEntity = this.nutritionRepository.create({
+      calories: n.calories,
+      carbohydrateContent: n.carbohydrateContent,
+      cholesterolContent: n.cholesterolContent,
+      fatContent: n.fatContent,
+      fiberContent: n.fiberContent,
+      proteinContent: n.proteinContent,
+      saturatedFatContent: n.saturatedFatContent,
+      servingSize: n.servingSize,
+      sodiumContent: n.sodiumContent,
+      sugarContent: n.sugarContent,
+    });
+
+    const entity = this.recipeRepository.create({
+      name: r.name,
+      description: r.description,
+      diet: r.diet,
+      keywords: r.keywords,
+      nutrition: nutritionEntity,
+      recipeCategory: r.recipeCategory,
+      recipeCuisine: r.recipeCuisine,
+      recipeYield: r.recipeYield,
+      totalTime: r.totalTime,
+    });
+
+    const ingredientEntities: IngredientEntity[] = ingredients.map(
+      (val: Ingredient) => {
+        return this.ingredientRepository.create({
+          ingredientId: val.ingredientId,
+          amount: val.amount,
+          name: val.name,
+          recipe: entity,
+          unit: val.unit,
+        });
+      },
+    );
+
+    const recipeInstructionStepEntities = instructions.map((val) => {
+      return this.instructionStepRepository.create({
+        recipe: entity,
+        text: val.text,
+        type: val.type,
+      });
+    });
+
+    entity.recipeIngredient = ingredientEntities;
+    entity.recipeInstructions = recipeInstructionStepEntities;
 
     // the scraper script handles the case where the recipe already exists
     try {
-      await client.send(new PutCommand(putCommandInput));
+      await this.createRecipeIfNotExists(
+        entity,
+        nutritionEntity,
+        ingredientEntities,
+        recipeInstructionStepEntities,
+      );
       return true;
     } catch (err) {
-      if (err instanceof Error) {
-        if (err.name === 'ConditionalCheckFailedException') {
-          console.log(`👎 Duplicate recipe ${entity.pk}. Returning false.`);
-          return false;
-        } else {
-          console.error(
-            `💣 Could not save recipe: ${err.name}. Skipping this item. Err: ${err}`,
-          );
-          throw new Error(err.name);
-        }
-      } else {
-        console.error(
-          `💣 Could not save recipe: ${JSON.stringify(
-            err,
-          )}. Skipping this item`,
-        );
-        throw new Error();
-      }
+      console.error(
+        `Something went wrong saving recipe ${entity.name}. Err: ${err}`,
+      );
+      return false;
     }
   }
 
@@ -321,5 +369,34 @@ export class ScrapingService {
     }
     // 62 + 0.5
     return integerPart + numericFraction;
+  }
+
+  async createRecipeIfNotExists(
+    r: RecipeEntity,
+    n: NutritionEntity,
+    ingredients: IngredientEntity[],
+    instructions: InstructionStepEntity[],
+  ) {
+    await this.dataSource.transaction(async (manager) => {
+      // Check if recipe already exists
+      const existingRecipe = await manager.getRepository(RecipeEntity).findOne({
+        where: { name: r.name, totalTime: r.totalTime },
+      });
+
+      if (existingRecipe) {
+        // Optionally return or log that the recipe already exists
+        console.log(
+          `👯‍♀️ Recipe with name ${existingRecipe.name} and total time ${existingRecipe.totalTime} already exists. Not saving.`,
+        );
+        return;
+      }
+
+      await manager.getRepository(NutritionEntity).save(n);
+
+      await manager.getRepository(RecipeEntity).save(r);
+
+      await manager.getRepository(IngredientEntity).save(ingredients);
+      await manager.getRepository(InstructionStepEntity).save(instructions);
+    });
   }
 }

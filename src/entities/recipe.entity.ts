@@ -1,217 +1,145 @@
-import { Type } from 'class-transformer';
 import {
-  IsArray,
-  IsDefined,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsPositive,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-
-export class Nutrition {
-  @IsOptional()
-  @IsString()
-  calories?: string;
-  @IsOptional()
-  @IsString()
-  carbohydrateContent?: string;
-  @IsOptional()
-  @IsString()
-  cholesterolContent?: string;
-  @IsOptional()
-  @IsString()
-  fatContent?: string;
-  @IsOptional()
-  @IsString()
-  fiberContent?: string;
-  @IsOptional()
-  @IsString()
-  proteinContent?: string;
-  @IsOptional()
-  @IsString()
-  saturatedFatContent?: string;
-  @IsOptional()
-  @IsString()
-  servingSize?: string;
-  @IsOptional()
-  @IsString()
-  sodiumContent?: string;
-  @IsOptional()
-  @IsString()
-  sugarContent?: string;
-
-  constructor(
-    calories?: string,
-    carbohydrateContent?: string,
-    cholesterolContent?: string,
-    fatContent?: string,
-    fiberContent?: string,
-    proteinContent?: string,
-    saturatedFatContent?: string,
-    servingSize?: string,
-    sodiumContent?: string,
-    sugarContent?: string,
-  ) {
-    if (calories) this.calories = calories;
-    if (carbohydrateContent) this.carbohydrateContent = carbohydrateContent;
-    if (cholesterolContent) this.cholesterolContent = cholesterolContent;
-    if (fatContent) this.fatContent = fatContent;
-    if (fiberContent) this.fiberContent = fiberContent;
-    if (proteinContent) this.proteinContent = proteinContent;
-    if (saturatedFatContent) this.saturatedFatContent = saturatedFatContent;
-    if (servingSize) this.servingSize = servingSize;
-    if (sodiumContent) this.sodiumContent = sodiumContent;
-    if (sugarContent) this.sugarContent = sugarContent;
-  }
-}
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+  ManyToOne,
+  UpdateDateColumn,
+} from 'typeorm';
 
 export enum Diet {
   NonMeat = 'Non-Meat',
   Meat = 'Meat',
 }
 
+@Entity()
+export class Nutrition {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
+  @Column({ nullable: true, type: 'varchar' })
+  calories: string | null = null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  carbohydrateContent: string | null = null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  cholesterolContent: string | null = null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  fatContent: string | null = null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  fiberContent: string | null = null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  proteinContent: string | null = null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  saturatedFatContent: string | null = null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  servingSize: string | null = null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  sodiumContent: string | null = null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  sugarContent: string | null = null;
+}
+
+@Entity()
 export class InstructionStep {
-  @IsDefined()
-  @IsString()
-  type: string;
-  @IsDefined()
-  @IsString()
-  text: string;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
-  constructor(type: string, text: string) {
-    this.type = type;
-    this.text = text;
-  }
+  @Column()
+  type = '';
+
+  @Column()
+  text = '';
+
+  @ManyToOne(() => Recipe, (recipe) => recipe.recipeInstructions, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'recipe_id' })
+  recipe!: Recipe;
 }
 
+@Entity()
 export class Ingredient {
-  @IsDefined()
-  @IsString()
-  ingredientId: string;
-  @IsDefined()
-  @IsString()
-  name: string;
-  @IsDefined()
-  @IsString()
-  unit: string;
-  @IsDefined()
-  @IsString()
-  amount: string;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
-  constructor(name: string, unit: string, amount: string) {
-    this.ingredientId = `${name.split(' ').join('_')}#${unit}`;
-    this.name = name;
-    this.unit = unit;
-    this.amount = amount;
-  }
+  @Column()
+  ingredientId = '';
+
+  @Column()
+  name = '';
+
+  @Column()
+  unit = '';
+
+  @Column()
+  amount = '';
+
+  @ManyToOne(() => Recipe, (recipe) => recipe.recipeIngredient, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'recipe_id' })
+  recipe!: Recipe;
 }
 
+@Entity()
 export class Recipe {
-  @IsDefined()
-  @IsString()
-  pk: string;
-  @IsDefined()
-  @IsString()
-  sk: string;
-  @IsDefined()
-  @IsString()
-  description: string;
-  @IsDefined()
-  @IsEnum(Diet)
-  diet: Diet;
-  @IsDefined()
-  @IsString()
-  GSI1_pk: string;
-  @IsDefined()
-  @IsString()
-  GSI1_sk: string;
-  @IsDefined()
-  @IsString()
-  GSI2_pk: string;
-  @IsDefined()
-  @IsString()
-  GSI2_sk: string;
-  @IsDefined()
-  @IsString()
-  GSI3_pk: string;
-  @IsDefined()
-  @IsInt()
-  @IsPositive()
-  GSI3_sk: number;
-  @IsDefined()
-  @IsArray()
-  @IsString({ each: true })
-  keywords: string[];
-  @IsDefined()
-  @IsString()
-  name: string;
-  @IsDefined()
-  @ValidateNested()
-  @Type(() => Nutrition)
-  nutrition: Nutrition;
-  @IsDefined()
-  @IsString()
-  recipeCategory: string;
-  @IsDefined()
-  @IsString()
-  recipeCuisine: string;
-  @IsDefined()
-  @ValidateNested({ each: true })
-  @Type(() => Ingredient)
-  recipeIngredient: Ingredient[];
-  @IsDefined()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => InstructionStep)
-  recipeInstructions: InstructionStep[];
-  @IsDefined()
-  @IsInt()
-  @IsPositive()
-  recipeYield: number;
-  @IsDefined()
-  @IsString()
-  totalTime: string;
-  @IsDefined()
-  @IsInt()
-  lastUpdated: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
-  constructor(
-    name: string,
-    description: string,
-    keywords: string[],
-    nutrition: Nutrition,
-    recipeCategory: string,
-    recipeCuisine: string,
-    recipeIngredient: Ingredient[],
-    recipeInstructions: InstructionStep[],
-    recipeYield: number,
-    totalTime: string,
-    recipeNumber: number,
-    diet: Diet,
-    lastUpdated: number,
-  ) {
-    this.pk = name;
-    this.sk = totalTime;
-    this.GSI1_pk = diet;
-    this.GSI1_sk = totalTime;
-    this.GSI2_pk = recipeCuisine;
-    this.GSI2_sk = totalTime;
-    this.GSI3_pk = '#RECIPENUMBERS';
-    this.GSI3_sk = recipeNumber;
+  @Column()
+  name = '';
 
-    this.description = description;
-    this.keywords = keywords;
-    this.nutrition = nutrition;
-    this.recipeCategory = recipeCategory;
-    this.recipeIngredient = recipeIngredient;
-    this.recipeInstructions = recipeInstructions;
-    this.recipeYield = recipeYield;
-    this.diet = diet;
-    this.name = name;
-    this.recipeCuisine = recipeCuisine;
-    this.totalTime = totalTime;
-    this.lastUpdated = lastUpdated;
-  }
+  @Column()
+  description = '';
+
+  @Column({
+    type: 'enum',
+    enum: Diet,
+  })
+  diet: Diet = Diet.Meat;
+
+  @Column('simple-array')
+  keywords: string[] = [];
+
+  @Column()
+  recipeCategory = '';
+
+  @Column()
+  recipeCuisine = '';
+
+  @Column()
+  recipeYield = -1;
+
+  @Column()
+  totalTime = '';
+
+  @UpdateDateColumn()
+  lastUpdated = '';
+
+  @OneToOne(() => Nutrition, { cascade: true, eager: true })
+  @JoinColumn()
+  nutrition!: Nutrition;
+
+  @OneToMany(() => Ingredient, (ingredient) => ingredient.recipe, {
+    cascade: true,
+    eager: true,
+  })
+  recipeIngredient!: Ingredient[];
+
+  @OneToMany(() => InstructionStep, (step) => step.recipe, {
+    cascade: true,
+    eager: true,
+  })
+  recipeInstructions!: InstructionStep[];
 }

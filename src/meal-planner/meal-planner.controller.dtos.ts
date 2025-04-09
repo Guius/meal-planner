@@ -1,14 +1,14 @@
 export interface Nutrition {
-  calories?: string;
-  carbohydrateContent?: string;
-  cholesterolContent?: string;
-  fatContent?: string;
-  fiberContent?: string;
-  proteinContent?: string;
-  saturatedFatContent?: string;
-  servingSize?: string;
-  sodiumContent?: string;
-  sugarContent?: string;
+  calories: string | null;
+  carbohydrateContent: string | null;
+  cholesterolContent: string | null;
+  fatContent: string | null;
+  fiberContent: string | null;
+  proteinContent: string | null;
+  saturatedFatContent: string | null;
+  servingSize: string | null;
+  sodiumContent: string | null;
+  sugarContent: string | null;
 }
 
 export interface Ingredient {

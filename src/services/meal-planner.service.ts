@@ -113,6 +113,8 @@ export class MealPlannerService {
       }
 
       // check that we don't already have this recipe in the recipes array
+      // FIXME: This used to work when using dynamodb but the structure of the entities has changed now
+      /*
       for (let i = 0; i < recipesSelected.length; i++) {
         Logger.debug(
           `Checking if recipe ${randomRecipe.GSI3_sk} already exists in selected recipes. Recipe selected ${i} number: ${recipesSelected[i].GSI3_sk}`,
@@ -124,6 +126,7 @@ export class MealPlannerService {
           continue;
         }
       }
+        */
 
       // push the recipe found to the selected recipes array
       recipesSelected.push(randomRecipe);
