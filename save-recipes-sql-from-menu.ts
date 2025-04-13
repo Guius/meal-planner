@@ -72,4 +72,4 @@ async function main(week: string) {
   );
 }
 
-main('2023-W40');
+main('2025-W15');

@@ -24,7 +24,7 @@ export class Recipe {
   @Column({ type: 'varchar' })
   name = '';
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'longtext' })
   description = '';
 
   @Column({
