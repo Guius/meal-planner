@@ -197,9 +197,7 @@ export class ScrapingService {
       // errors is an array of validation errors
       if (errors.length > 0) {
         Logger.error(
-          `Recipe failed validation. Recipe: ${JSON.stringify(
-            entity,
-          )} errors: `,
+          `Recipe failed validation. Recipe: ${JSON.stringify(r)} errors: `,
           errors,
         );
         throw new InternalServerErrorException();
@@ -208,67 +206,13 @@ export class ScrapingService {
       }
     });
 
-    // convert the validation objects into sql entities
-    const nutritionEntity = this.nutritionRepository.create({
-      calories: n.calories,
-      carbohydrateContent: n.carbohydrateContent,
-      cholesterolContent: n.cholesterolContent,
-      fatContent: n.fatContent,
-      fiberContent: n.fiberContent,
-      proteinContent: n.proteinContent,
-      saturatedFatContent: n.saturatedFatContent,
-      servingSize: n.servingSize,
-      sodiumContent: n.sodiumContent,
-      sugarContent: n.sugarContent,
-    });
-
-    const entity = this.recipeRepository.create({
-      name: r.name,
-      description: r.description,
-      diet: r.diet,
-      keywords: r.keywords,
-      nutrition: nutritionEntity,
-      recipeCategory: r.recipeCategory,
-      recipeCuisine: r.recipeCuisine,
-      recipeYield: r.recipeYield,
-      totalTime: r.totalTime,
-    });
-
-    const ingredientEntities: IngredientEntity[] = ingredients.map(
-      (val: Ingredient) => {
-        return this.ingredientRepository.create({
-          ingredientId: val.ingredientId,
-          amount: val.amount,
-          name: val.name,
-          recipe: entity,
-          unit: val.unit,
-        });
-      },
-    );
-
-    const recipeInstructionStepEntities = instructions.map((val) => {
-      return this.instructionStepRepository.create({
-        recipe: entity,
-        text: val.text,
-        type: val.type,
-      });
-    });
-
-    entity.recipeIngredient = ingredientEntities;
-    entity.recipeInstructions = recipeInstructionStepEntities;
-
     // the scraper script handles the case where the recipe already exists
     try {
-      await this.createRecipeIfNotExists(
-        entity,
-        nutritionEntity,
-        ingredientEntities,
-        recipeInstructionStepEntities,
-      );
+      await this.createRecipeIfNotExists(r, n, ingredients, instructions);
       return true;
     } catch (err) {
       console.error(
-        `Something went wrong saving recipe ${entity.name}. Err: ${err}`,
+        `Something went wrong saving recipe ${r.name}. Err: ${err}`,
       );
       return false;
     }
@@ -372,10 +316,10 @@ export class ScrapingService {
   }
 
   async createRecipeIfNotExists(
-    r: RecipeEntity,
-    n: NutritionEntity,
-    ingredients: IngredientEntity[],
-    instructions: InstructionStepEntity[],
+    r: Recipe,
+    n: Nutrition,
+    ingredients: Ingredient[],
+    instructions: InstructionStep[],
   ) {
     await this.dataSource.transaction(async (manager) => {
       // Check if recipe already exists
@@ -391,12 +335,62 @@ export class ScrapingService {
         return;
       }
 
-      await manager.getRepository(NutritionEntity).save(n);
+      const nutritionEntity = manager.getRepository(NutritionEntity).create({
+        calories: n.calories,
+        carbohydrateContent: n.carbohydrateContent,
+        cholesterolContent: n.cholesterolContent,
+        fatContent: n.fatContent,
+        fiberContent: n.fiberContent,
+        proteinContent: n.proteinContent,
+        saturatedFatContent: n.saturatedFatContent,
+        servingSize: n.servingSize,
+        sodiumContent: n.sodiumContent,
+        sugarContent: n.sugarContent,
+      });
 
-      await manager.getRepository(RecipeEntity).save(r);
+      const entity = manager.getRepository(RecipeEntity).create({
+        name: r.name,
+        description: r.description,
+        diet: r.diet,
+        keywords: r.keywords,
+        nutrition: nutritionEntity,
+        recipeCategory: r.recipeCategory,
+        recipeCuisine: r.recipeCuisine,
+        recipeYield: r.recipeYield,
+        totalTime: r.totalTime,
+      });
 
-      await manager.getRepository(IngredientEntity).save(ingredients);
-      await manager.getRepository(InstructionStepEntity).save(instructions);
+      const ingredientEntities: IngredientEntity[] = ingredients.map(
+        (val: Ingredient) => {
+          return manager.getRepository(IngredientEntity).create({
+            ingredientId: val.ingredientId,
+            amount: val.amount,
+            name: val.name,
+            recipe: entity,
+            unit: val.unit,
+          });
+        },
+      );
+
+      const recipeInstructionStepEntities = instructions.map((val) => {
+        return manager.getRepository(recipeInstructionStepEntities).create({
+          recipe: entity,
+          text: val.text,
+          type: val.type,
+        });
+      });
+
+      entity.recipeIngredient = ingredientEntities;
+      entity.recipeInstructions = recipeInstructionStepEntities;
+
+      await manager.getRepository(NutritionEntity).save(nutritionEntity);
+
+      await manager.getRepository(RecipeEntity).save(entity);
+
+      await manager.getRepository(IngredientEntity).save(ingredientEntities);
+      await manager
+        .getRepository(InstructionStepEntity)
+        .save(recipeInstructionStepEntities);
     });
   }
 }
