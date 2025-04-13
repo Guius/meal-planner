@@ -163,7 +163,6 @@ export class Recipe {
     recipeInstructions: InstructionStep[],
     recipeYield: number,
     totalTime: string,
-    recipeNumber: number,
     diet: Diet,
     lastUpdated: number,
   ) {

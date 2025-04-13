@@ -99,7 +99,6 @@ export class ScrapingService {
   async saveRecipe(
     recipe: Record<string, unknown>,
     recipeId: string,
-    recipeNumber: number,
   ): Promise<boolean> {
     /**
      * The title is in format: speedy-bulgogi-chicken-noodles-65cb875708f1b9082fbcc57f
@@ -184,7 +183,6 @@ export class ScrapingService {
       instructions,
       recipe.recipeYield as number,
       recipe.totalTime as string,
-      recipeNumber,
       diet,
       Date.now(),
     );
@@ -206,16 +204,10 @@ export class ScrapingService {
       }
     });
 
-    // the scraper script handles the case where the recipe already exists
-    try {
-      await this.createRecipeIfNotExists(r, n, ingredients, instructions);
-      return true;
-    } catch (err) {
-      console.error(
-        `Something went wrong saving recipe ${r.name}. Err: ${err}`,
-      );
-      return false;
-    }
+    /**
+     * Let the error bubble to the scraper script
+     */
+    return await this.createRecipeIfNotExists(r, n, ingredients, instructions);
   }
 
   /**
@@ -315,13 +307,20 @@ export class ScrapingService {
     return integerPart + numericFraction;
   }
 
+  /**
+   * Returns
+   * - true if recipe save successful
+   * - false if there is a duplicatge
+   * - error if anything has gone wrong when saving recipe
+   *
+   */
   async createRecipeIfNotExists(
     r: Recipe,
     n: Nutrition,
     ingredients: Ingredient[],
     instructions: InstructionStep[],
-  ) {
-    await this.dataSource.transaction(async (manager) => {
+  ): Promise<boolean> {
+    const result = await this.dataSource.transaction(async (manager) => {
       // Check if recipe already exists
       const existingRecipe = await manager.getRepository(RecipeEntity).findOne({
         where: { name: r.name, totalTime: r.totalTime },
@@ -332,7 +331,7 @@ export class ScrapingService {
         console.log(
           `👯‍♀️ Recipe with name ${existingRecipe.name} and total time ${existingRecipe.totalTime} already exists. Not saving.`,
         );
-        return;
+        return false;
       }
 
       const nutritionEntity = manager.getRepository(NutritionEntity).create({
@@ -391,6 +390,10 @@ export class ScrapingService {
       await manager
         .getRepository(InstructionStepEntity)
         .save(recipeInstructionStepEntities);
+
+      return true;
     });
+
+    return result;
   }
 }
