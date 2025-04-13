@@ -1,9 +1,18 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Initial1744548626932 implements MigrationInterface {
-  name = 'Initial1744548626932';
+export class Initial1744549135649 implements MigrationInterface {
+  name = 'Initial1744549135649';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `CREATE TABLE \`instruction_step\` (\`id\` varchar(36) NOT NULL, \`step\` varchar(255) NOT NULL, \`text\` longtext NOT NULL, \`recipe_id\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE \`nutrition\` (\`id\` varchar(36) NOT NULL, \`calories\` varchar(255) NULL, \`carbohydrateContent\` varchar(255) NULL, \`cholesterolContent\` varchar(255) NULL, \`fatContent\` varchar(255) NULL, \`fiberContent\` varchar(255) NULL, \`proteinContent\` varchar(255) NULL, \`saturatedFatContent\` varchar(255) NULL, \`servingSize\` varchar(255) NULL, \`sodiumContent\` varchar(255) NULL, \`sugarContent\` varchar(255) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE \`ingredient\` (\`id\` varchar(36) NOT NULL, \`ingredientId\` varchar(255) NOT NULL, \`name\` varchar(255) NOT NULL, \`unit\` varchar(255) NOT NULL, \`amount\` varchar(255) NOT NULL, \`recipe_id\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
+    );
     await queryRunner.query(
       `CREATE TABLE \`recipe\` (\`id\` varchar(36) NOT NULL, \`name\` varchar(255) NOT NULL, \`description\` varchar(255) NOT NULL, \`diet\` enum ('Non-Meat', 'Meat') NOT NULL, \`keywords\` text NOT NULL, \`recipeCategory\` varchar(255) NOT NULL, \`recipeCuisine\` varchar(255) NOT NULL, \`recipeYield\` varchar(255) NOT NULL, \`totalTime\` varchar(255) NOT NULL, \`lastUpdated\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`nutritionId\` varchar(36) NULL, UNIQUE INDEX \`REL_25dc0c9ee3e4a0de9d19f4c479\` (\`nutritionId\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`,
     );
@@ -32,5 +41,8 @@ export class Initial1744548626932 implements MigrationInterface {
       `DROP INDEX \`REL_25dc0c9ee3e4a0de9d19f4c479\` ON \`recipe\``,
     );
     await queryRunner.query(`DROP TABLE \`recipe\``);
+    await queryRunner.query(`DROP TABLE \`ingredient\``);
+    await queryRunner.query(`DROP TABLE \`nutrition\``);
+    await queryRunner.query(`DROP TABLE \`instruction_step\``);
   }
 }

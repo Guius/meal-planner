@@ -62,15 +62,14 @@ async function main(week: string) {
       );
       continue;
     }
-
-    console.log(
-      `👏 Successfully saved ${
-        menu.length - (numberOfDuplicates ?? 0)
-      } recipes. Total recipes: ${menu.length}. Duplicates: ${
-        numberOfDuplicates ?? 0
-      }`,
-    );
   }
+  console.log(
+    `👏 Successfully saved ${
+      menu.length - (numberOfDuplicates ?? 0)
+    } recipes. Total recipes: ${menu.length}. Duplicates: ${
+      numberOfDuplicates ?? 0
+    }`,
+  );
 }
 
 main('2023-W40');

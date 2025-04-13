@@ -8,6 +8,10 @@ import { ServicesModule } from './services/services.module';
 import { RecipesService } from './services/recipes.service';
 import { RecipesModule } from './recipes/recipes.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Recipe } from './entities/recipe.entity';
+import { InstructionStep } from './entities/instruction-step.entity';
+import { Nutrition } from './entities/nutrition.entity';
+import { Ingredient } from './entities/ingredient.entity';
 
 @Module({
   imports: [
@@ -21,6 +25,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           throw Error('DATABASE_PORT MISSING');
         }
         return {
+          entities: [Recipe, InstructionStep, Nutrition, Ingredient],
           type: 'mysql',
           host: process.env.DATABASE_HOST,
           port: process.env.DATABASE_PORT ? +process.env.DATABASE_PORT : 3306,

@@ -15,7 +15,7 @@ export class InstructionStep {
   @Column({ type: 'varchar' })
   step = '';
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'longtext' })
   text = '';
 
   @ManyToOne(() => Recipe, (recipe) => recipe.recipeInstructions, {

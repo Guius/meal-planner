@@ -23,26 +23,13 @@ import { Recipe as RecipeEntity } from '../entities/recipe.entity';
 import { Ingredient as IngredientEntity } from '../entities/ingredient.entity';
 import { Nutrition as NutritionEntity } from '../entities/nutrition.entity';
 import { InstructionStep as InstructionStepEntity } from '../entities/instruction-step.entity';
-import { MealPlannerService } from '../services/meal-planner.service';
-import { RecipesService } from '../services/recipes.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ScrapingService {
   constructor(
     private readonly httpService: HttpService,
     private appService: AppService,
-    private mealPlannerService: MealPlannerService,
-    private recipesService: RecipesService,
-    @InjectRepository(Recipe)
-    private readonly recipeRepository: Repository<RecipeEntity>,
-    @InjectRepository(IngredientEntity)
-    private readonly ingredientRepository: Repository<IngredientEntity>,
-    @InjectRepository(InstructionStepEntity)
-    private readonly instructionStepRepository: Repository<InstructionStepEntity>,
-    @InjectRepository(NutritionEntity)
-    private readonly nutritionRepository: Repository<NutritionEntity>,
     private dataSource: DataSource,
   ) {}
   async scraping(url: string) {
@@ -345,6 +332,8 @@ export class ScrapingService {
         sugarContent: n.sugarContent,
       });
 
+      await manager.getRepository(NutritionEntity).save(nutritionEntity);
+
       const entity = manager.getRepository(RecipeEntity).create({
         name: r.name,
         description: r.description,
@@ -356,6 +345,8 @@ export class ScrapingService {
         recipeYield: r.recipeYield,
         totalTime: r.totalTime,
       });
+
+      await manager.getRepository(RecipeEntity).save(entity);
 
       const ingredientEntities: IngredientEntity[] = ingredients.map(
         (val: Ingredient) => {
@@ -379,10 +370,6 @@ export class ScrapingService {
 
       entity.recipeIngredient = ingredientEntities;
       entity.recipeInstructions = recipeInstructionStepEntities;
-
-      await manager.getRepository(NutritionEntity).save(nutritionEntity);
-
-      await manager.getRepository(RecipeEntity).save(entity);
 
       await manager.getRepository(IngredientEntity).save(ingredientEntities);
       await manager
