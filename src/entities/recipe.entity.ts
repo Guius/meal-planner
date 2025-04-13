@@ -5,9 +5,11 @@ import {
   OneToMany,
   OneToOne,
   JoinColumn,
-  ManyToOne,
   UpdateDateColumn,
 } from 'typeorm';
+import { InstructionStep } from './instruction-step.entity';
+import { Nutrition } from './nutrition.entity';
+import { Ingredient } from './ingredient.entity';
 
 export enum Diet {
   NonMeat = 'Non-Meat',
@@ -15,92 +17,14 @@ export enum Diet {
 }
 
 @Entity()
-export class Nutrition {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column({ nullable: true, type: 'varchar' })
-  calories: string | null = null;
-
-  @Column({ nullable: true, type: 'varchar' })
-  carbohydrateContent: string | null = null;
-
-  @Column({ nullable: true, type: 'varchar' })
-  cholesterolContent: string | null = null;
-
-  @Column({ nullable: true, type: 'varchar' })
-  fatContent: string | null = null;
-
-  @Column({ nullable: true, type: 'varchar' })
-  fiberContent: string | null = null;
-
-  @Column({ nullable: true, type: 'varchar' })
-  proteinContent: string | null = null;
-
-  @Column({ nullable: true, type: 'varchar' })
-  saturatedFatContent: string | null = null;
-
-  @Column({ nullable: true, type: 'varchar' })
-  servingSize: string | null = null;
-
-  @Column({ nullable: true, type: 'varchar' })
-  sodiumContent: string | null = null;
-
-  @Column({ nullable: true, type: 'varchar' })
-  sugarContent: string | null = null;
-}
-
-@Entity()
-export class InstructionStep {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column()
-  type = '';
-
-  @Column()
-  text = '';
-
-  @ManyToOne(() => Recipe, (recipe) => recipe.recipeInstructions, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'recipe_id' })
-  recipe!: Recipe;
-}
-
-@Entity()
-export class Ingredient {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
-  @Column()
-  ingredientId = '';
-
-  @Column()
-  name = '';
-
-  @Column()
-  unit = '';
-
-  @Column()
-  amount = '';
-
-  @ManyToOne(() => Recipe, (recipe) => recipe.recipeIngredient, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'recipe_id' })
-  recipe!: Recipe;
-}
-
-@Entity()
 export class Recipe {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   name = '';
 
-  @Column()
+  @Column({ type: 'varchar' })
   description = '';
 
   @Column({
@@ -112,20 +36,20 @@ export class Recipe {
   @Column('simple-array')
   keywords: string[] = [];
 
-  @Column()
+  @Column({ type: 'varchar' })
   recipeCategory = '';
 
-  @Column()
+  @Column({ type: 'varchar' })
   recipeCuisine = '';
 
-  @Column()
+  @Column({ type: 'varchar' })
   recipeYield = -1;
 
-  @Column()
+  @Column({ type: 'varchar' })
   totalTime = '';
 
   @UpdateDateColumn()
-  lastUpdated = '';
+  lastUpdated!: string;
 
   @OneToOne(() => Nutrition, { cascade: true, eager: true })
   @JoinColumn()

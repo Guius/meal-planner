@@ -19,12 +19,10 @@ import {
   Nutrition,
   Recipe,
 } from '../lib/recipe-validation.dtos';
-import {
-  Recipe as RecipeEntity,
-  Ingredient as IngredientEntity,
-  InstructionStep as InstructionStepEntity,
-  Nutrition as NutritionEntity,
-} from '../entities/recipe.entity';
+import { Recipe as RecipeEntity } from '../entities/recipe.entity';
+import { Ingredient as IngredientEntity } from '../entities/ingredient.entity';
+import { Nutrition as NutritionEntity } from '../entities/nutrition.entity';
+import { InstructionStep as InstructionStepEntity } from '../entities/instruction-step.entity';
 import { MealPlannerService } from '../services/meal-planner.service';
 import { RecipesService } from '../services/recipes.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -372,10 +370,10 @@ export class ScrapingService {
       );
 
       const recipeInstructionStepEntities = instructions.map((val) => {
-        return manager.getRepository(recipeInstructionStepEntities).create({
+        return manager.getRepository(InstructionStepEntity).create({
           recipe: entity,
           text: val.text,
-          type: val.type,
+          step: val.type,
         });
       });
 

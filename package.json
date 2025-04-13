@@ -19,7 +19,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "scrape:week": "ts-node ./save-recipes-from-menu.ts",
-    "update1": "ts-node ./update-recipes-1.ts"
+    "update1": "ts-node ./update-recipes-1.ts",
+    "migrate": "npm run build && ts-node ./node_modules/typeorm/cli.js migration:run -d ./data-source.ts",
+    "generate": "npm run build && ts-node ./node_modules/typeorm/cli.js migration:generate -d ./data-source.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.637.0",

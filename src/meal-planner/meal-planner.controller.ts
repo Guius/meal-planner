@@ -10,6 +10,7 @@ import {
 import { MealPlannerService } from '../services/meal-planner.service';
 import {
   GenerateAndSendHTMLRequest,
+  InstructionStep,
   RandomRecipeDto,
 } from './meal-planner.controller.dtos';
 
@@ -44,7 +45,14 @@ export class MealPlannerController {
         keywords: val.keywords,
         diet: val.diet,
         nutrition: val.nutrition,
-        recipeInstructions: val.recipeInstructions,
+        recipeInstructions: val.recipeInstructions.map(
+          (val): InstructionStep => {
+            return {
+              text: val.text,
+              type: val.step,
+            };
+          },
+        ),
         recipeYield: val.recipeYield,
       };
     });
